@@ -141,7 +141,7 @@ def clean_str_sst(string):
 
 def get_mairesse_features(file_name):
     feats={}
-    with open(file_name, "rb") as csvf:
+    with open(file_name, "r") as csvf:
         csvreader=csv.reader(csvf,delimiter=',',quotechar='"')
         for line in csvreader:
             feats[line[0]]=[float(f) for f in line[1:]]
