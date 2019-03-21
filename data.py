@@ -112,8 +112,8 @@ def load_data(attr,batch_size=5):
     revs, W, W2, word_idx_map, vocab, mairesse = x[0], x[1], x[2], x[3], x[4], x[5]
     print ("data loaded!")
     charged_words=[]
-    with open("Emotion_Lexicon.csv","r") as f :
-        csvf=csv.reader(f, delimiter=',',quotechar='"')
+    emof=open("Emotion_Lexicon.csv","r")
+    csvf=csv.reader(emof, delimiter=',',quotechar='"')
     first_line=True
 
     for line in csvf:
@@ -122,6 +122,8 @@ def load_data(attr,batch_size=5):
             continue
         if line[11]=="1":
             charged_words.append(line[0])
+
+    emof.close()
 
     charged_words=set(charged_words)
 
@@ -153,9 +155,9 @@ def load_data(attr,batch_size=5):
         test_set_y = np.asarray(datasets[3],int)
         test_set_m = datasets[5]
         print('before transform idx to embed')
-        print(data.flatten().shape)
         
         def data_idx2vec(data):
+            print(data.flatten().shape)
             return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
         train_set_x=data_idx2vec(train_set_x)
 
