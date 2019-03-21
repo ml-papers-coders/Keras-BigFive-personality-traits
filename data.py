@@ -105,7 +105,7 @@ def mini_batches(data_size,batch_size,test_size=0.1,seed=3435):
         yield (train_batch,test_batch,i+1)
     
 
-def load_data(attr,mini_batch_size=5):
+def load_data(attr,mini_batch_size=50):
     print ("loading data...")
     with open("processed.pkl","rb") as f:
         x = pickle.load(f)
@@ -158,7 +158,7 @@ def load_data(attr,mini_batch_size=5):
                 test_set_m = datasets[5]
                 print('before transform idx to embed')
                 train_set_x=data_idx2vec(train_set_x)
-                print(train_set_x.shape)
+                #print(train_set_x.shape)
 
         #train_set_x.shape _ (batch,sentences_in_text,words_indexesin sentence) 
 
