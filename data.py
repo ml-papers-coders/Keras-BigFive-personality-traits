@@ -113,7 +113,7 @@ def load_data(attr,mini_batch_size=50,cv=0,test=False):
     
     def data_idx2vec(data):
         print(data.flatten().shape)
-        return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],W.shape[1]))
+        return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],,W.shape[1]))
 
     print ("data loaded!")
     charged_words=[]
@@ -158,12 +158,17 @@ def load_data(attr,mini_batch_size=50,cv=0,test=False):
                     train_set_m=datasets[4][t].reshape((t.shape[0],-1))
                     val_set_m=datasets[4][v].reshape((v.shape[0],-1))
                     #print('Mini-batch load : before transform idx to embed')
+                    print(train_set_x.shape)
                     train_set_x=data_idx2vec(train_set_x)
                     val_set_x=data_idx2vec(val_set_x)
+                    """
                     print(train_set_x.shape)
                     print(train_set_m.shape)
+                    (45, 47736, 300)
+                    (45, 84) 
+                    """
                     yield train_set_x,train_set_y,val_set_x,val_set_y,train_set_m,val_set_m
 
                     # (45, 312, 153, 300)
                     #(batch,sentences_in_text,words_indexesin sentence)
-next(load_data(2))
+                    #next(load_data(2))
