@@ -1,4 +1,4 @@
-from model import SentenceLevel,DocumentLevel
+from model import BigFiveCnnModel
 from tensorflow.keras.models import Model
 
 
@@ -18,11 +18,12 @@ for filter_h in filter_hs:
     pool_sizes.append((img_h-filter_h+1,img_w-filter_w+1))
 #input_shape=(312,153, 300) : nb_sents X nb_words X E
 #Batch : (batch=nb_docs)*nb sentences
-inputLayer,concatlayer=SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=filter_hs)
-
 docs_size=312
-outputLayer=DocumentLevel(concatlayer,docs_size)
-print(Model(inputs=inputLayer,outputs=outputLayer).summary())
+Model=BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=filter_hs,docs_size=docs_size)
+
+print(Model.summary())
+from tensorflow.keras.utils import plot_model
+plot_model(Model(inputs=inputLayer,outputs=outputLayer), to_file='model.png')
 
 """
 from tensorflow.keras.utils import plot_model

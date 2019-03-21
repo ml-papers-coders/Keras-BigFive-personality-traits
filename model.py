@@ -1,5 +1,5 @@
 from tensorflow.keras.models import Sequential,Model
-from tensorflow.keras.layers import Dense, Activation ,Conv2D,MaxPooling2D , Input,Concatenate, Reshape,Flatten
+from tensorflow.keras.layers import Dense, Activation ,Conv2D,MaxPooling2D , Input,Concatenate, Reshape,Flatten,Dense
 
 
 def SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,2,3],hidden_units=[200,200,2],conv_non_linear='relu'):
@@ -25,11 +25,19 @@ def SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,
     concat_layer=Concatenate()(layers)
 
     
-    return model_input_layer,concat_layer
+    return Model(inputs=model_input_layer,outputs=concat_layer)
 
-def DocumentLevel(sentlevel_output,docs_size):
+def DocumentLevel(sentlevel,docs_size=312):
     # batch*docs X 1 X 1 X sentVec to batch X docs X sentVec
-    output=Reshape((docs_size,sentlevel_output.shape[-1]))(sentlevel_output)
+    output=Reshape((docs_size,sentlevel.output.shape[-1]))(sentlevel.output)
     # list of 84 M features per doc
-    m_features=Input(shape=())
-    return output
+    m_features=Input(shape=(docs_size,84))
+    output=Concatenate()([output,m_features])
+    output=Dense(200,activation='softmax')(output)
+    output=Dense(2,activation="softmax")(output)
+    return Model(inputs=[sentlevel.input,m_features],outputs=output)
+
+def BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,2,3],hidden_units=[200,200,2],conv_non_linear='relu',docs_size=312):
+    SentModel=SentenceLevel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs)
+    model=DocumentLevel(SentModel,docs_size)
+    return model
