@@ -113,7 +113,7 @@ def load_data(attr,mini_batch_size=50):
     
     def data_idx2vec(data):
         print(data.flatten().shape)
-        return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
+        return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],W.shape[1]))
 
     print ("data loaded!")
     charged_words=[]
@@ -146,19 +146,18 @@ def load_data(attr,mini_batch_size=50):
         for t,v,_ in mini_batches_generator:
                 #divide train set into train/val sets
                 ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
-                train_set_x=datasets[0][t]
-                val_set_x=datasets[0][v]
-                train_set_y=datasets[1][t]
-                val_set_y=datasets[1][v]
-                train_set_m=datasets[4][t]
-                val_set_m=datasets[4][v]
-                test_set_x = datasets[2]
-                test_set_y = np.asarray(datasets[3],int)
-                test_set_m = datasets[5]
+                train_set_x=datasets[0][t].reshape((datasets[0].shape[0],-1))
+                val_set_x=datasets[0][v].reshape((datasets[0].shape[0],-1))
+                train_set_y=datasets[1][t].reshape((datasets[0].shape[0],-1))
+                val_set_y=datasets[1][v].reshape((datasets[0].shape[0],-1))
+                train_set_m=datasets[4][t].reshape((datasets[0].shape[0],-1))
+                val_set_m=datasets[4][v].reshape((datasets[0].shape[0],-1))
+                test_set_x = datasets[2].reshape((datasets[0].shape[0],-1))
+                test_set_y = np.asarray(datasets[3],int).reshape((datasets[0].shape[0],-1))
+                test_set_m = datasets[5].reshape((datasets[0].shape[0],-1))
                 #print('Mini-batch load : before transform idx to embed')
                 train_set_x=data_idx2vec(train_set_x)
-                print(train_set_x.shape)
-
-        #train_set_x.shape _ (batch,sentences_in_text,words_indexesin sentence) 
-
+                #print(train_set_x.shape)
+                # (45, 312, 153, 300)
+                #(batch,sentences_in_text,words_indexesin sentence)
 load_data(2)
