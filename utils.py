@@ -107,11 +107,11 @@ def mini_batches(data_size,batch_size,test_size=0.1,seed=3435):
 
 def load_data(attr,batch_size=50):
     print ("loading data...")
-    x = pickle.load(open("processed.pkl","r"))
+    x = pickle.load(open("processed.pkl","rb"))
     revs, W, W2, word_idx_map, vocab, mairesse = x[0], x[1], x[2], x[3], x[4], x[5]
     print ("data loaded!")
     charged_words=[]
-    emof=open("Emotion_Lexicon.csv","rb")
+    emof=open("Emotion_Lexicon.csv","r")
     csvf=csv.reader(emof, delimiter=',',quotechar='"')
     first_line=True
 
