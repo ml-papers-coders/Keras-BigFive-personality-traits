@@ -3,8 +3,8 @@ import pickle as cPickle
 import numpy as np
 from collections import defaultdict, OrderedDict
 import tensorflow as tf
-from tf.keras.models import Sequential
-from tf.keras.layers import Dense, Activation ,Conv2D,MaxPooling2D
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation ,Conv2D,MaxPooling2D
 #import theano
 #print('Theano loaded')
 #import theano.tensor as T
@@ -17,19 +17,7 @@ import getpass
 import csv
 warnings.filterwarnings("ignore")
 
-#different non-linearities
-def ReLU(x):
-    y = T.maximum(0.0, x)
-    return(y)
-def Sigmoid(x):
-    y = T.nnet.sigmoid(x)
-    return(y)
-def Tanh(x):
-    y = T.tanh(x)
-    return(y)
-def Iden(x):
-    y = x
-    return(y)
+
 
 def train_conv_net(datasets,
                    U,
@@ -78,15 +66,32 @@ def train_conv_net(datasets,
                     ,("sqr_norm_lim",sqr_norm_lim),("shuffle_batch",shuffle_batch)]
     print (parameters)
 
-    #define model architecture
-    index = T.lscalar()
-    x = T.tensor3('x')
-    y = T.ivector('y')
-    mair = T.fmatrix('mair')
-    Words = theano.shared(value = U, name = "Words")
-    zero_vec_tensor = T.vector()
-    zero_vec = np.zeros(img_w)
-    set_zero = theano.function([zero_vec_tensor], updates=[(Words, T.set_subtensor(Words[0,:], zero_vec_tensor))], allow_input_downcast=True)
+    #data words idx to embedding
+    def data_idx2embed():
+    layer0_input_train = 
+   
+    #shuffle dataset and assign to mini batches. if dataset size is not a multiple of mini batches, replicate
+    #extra data (at random)
+    from utils import mini_batches
+    mini_batches_generator=mini_batches(datasets.shape[0],batch_size=batch_size)
+    train_mini_batches_idx=np.asarray([])
+    val_mini_batches_idx=np.asarray([])
+    for t,v,_ in mini_batches_generator:
+        train_mini_batches_idx=np.append(train_mini_batches_idx,t)
+        val_mini_batches_idx=np.append(val_mini_batches_idx,v)
+    
+    #divide train set into train/val sets
+    ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
+    train_set_x=datasets[0][train_mini_batches_idx]
+    val_set_x=datasets[0][val_mini_batches_idx]
+    train_set_y=datasets[1][train_mini_batches_idx]
+    val_set_y=datasets[1][val_mini_batches_idx]
+    train_set_m=datasets[4][train_mini_batches_idx]
+    val_set_m=datasets[4][val_mini_batches_idx]
+    test_set_x = datasets[2]
+    test_set_y = np.asarray(datasets[3],int)
+    test_set_m = datasets[5]
+    
 
     conv_layers = Sequential()
     
@@ -95,14 +100,13 @@ def train_conv_net(datasets,
     for i in range(len(filter_hs)):
         filter_shape = filter_shapes[i]
         pool_size = pool_sizes[i]
-        conv_layers.add(Conv2D(filter_shape,activation=conv_non_linear,input_shape=x_train.shape[1:]))
+        conv_layers.add(Conv2D(filter_shape,activation=conv_non_linear,input_shape=train_set_x.shape[1:]))
         conv_layers.add(MaxPooling2D(pool_size=pool_size))
         #conv_layer = LeNetConvPoolLayer(rng, image_shape=None,
         #                        filter_shape=filter_shape, poolsize=pool_size, non_linear=conv_non_linear)
         #conv_layers.append(conv_layer)
 
     # ???
-    layer0_input = Words[T.cast(x.flatten(),dtype=int)].reshape((x.shape[0],x.shape[1],x.shape[2],Words.shape[1]))
 
     def convolve_user_statuses(statuses):
         layer1_inputs = []
@@ -139,63 +143,11 @@ def train_conv_net(datasets,
         params += conv_layer.params
     if non_static:
         #if word vectors are allowed to change, add them as model parameters
-        params += [Words]
+        params += [idx_embed]
     cost = classifier.negative_log_likelihood(y)
     dropout_cost = classifier.dropout_negative_log_likelihood(y)
     grad_updates = sgd_updates_adadelta(params, dropout_cost, lr_decay, 1e-6, sqr_norm_lim)
 
-    #shuffle dataset and assign to mini batches. if dataset size is not a multiple of mini batches, replicate
-    #extra data (at random)
-    np.random.seed(3435)
-    if datasets[0].shape[0] % batch_size > 0:
-        extra_data_num = batch_size - datasets[0].shape[0] % batch_size
-        rand_perm = np.random.permutation(range(len(datasets[0])))
-        train_set_x = datasets[0][rand_perm]
-        train_set_y = datasets[1][rand_perm]
-        train_set_m = datasets[4][rand_perm]
-        extra_data_x = train_set_x[:extra_data_num]
-        extra_data_y = train_set_y[:extra_data_num]
-        extra_data_m = train_set_m[:extra_data_num]
-        new_data_x = np.append(datasets[0],extra_data_x,axis=0)
-        new_data_y = np.append(datasets[1],extra_data_y,axis=0)
-        new_data_m = np.append(datasets[4],extra_data_m,axis=0)
-    else:
-        new_data_x = datasets[0]
-        new_data_y = datasets[1]
-        new_data_m = datasets[4]
-    rand_perm = np.random.permutation(range(len(new_data_x)))
-    new_data_x = new_data_x[rand_perm]
-    new_data_y = new_data_y[rand_perm]
-    new_data_m = new_data_m[rand_perm]
-    n_batches = new_data_x.shape[0]/batch_size
-    n_train_batches = int(np.round(n_batches*0.9))
-    #divide train set into train/val sets
-    test_set_x = datasets[2]
-    test_set_y = np.asarray(datasets[3],int)
-    test_set_m = datasets[5]
-    train_set_x, train_set_y, train_set_m = shared_dataset((new_data_x[:n_train_batches*batch_size], new_data_y[:n_train_batches*batch_size], new_data_m[:n_train_batches*batch_size]))
-    val_set_x, val_set_y, val_set_m = shared_dataset((new_data_x[n_train_batches*batch_size:], new_data_y[n_train_batches*batch_size:], new_data_m[n_train_batches*batch_size:]))
-    n_val_batches = n_batches - n_train_batches
-    val_model = theano.function([index], classifier.errors(y),
-         givens={
-            x: val_set_x[index * batch_size: (index + 1) * batch_size],
-             y: val_set_y[index * batch_size: (index + 1) * batch_size],
-              mair: val_set_m[index * batch_size: (index + 1) * batch_size]},##mairesse_change
-                                allow_input_downcast = True)
-
-    #compile theano functions to get train/val/test errors
-    test_model = theano.function([index], [classifier.errors(y), svm_data],
-             givens={
-                x: train_set_x[index * batch_size: (index + 1) * batch_size],
-                 y: train_set_y[index * batch_size: (index + 1) * batch_size],
-                  mair: train_set_m[index * batch_size: (index + 1) * batch_size]},##mairesse_change
-                                 allow_input_downcast=True)
-    train_model = theano.function([index], cost, updates=grad_updates,
-          givens={
-            x: train_set_x[index*batch_size:(index+1)*batch_size],
-              y: train_set_y[index*batch_size:(index+1)*batch_size],
-                mair: train_set_m[index * batch_size: (index + 1) * batch_size]},##mairesse_change
-                                  allow_input_downcast = True)
 
     test_y_pred = classifier.predict(layer1_input)
     test_error = T.sum(T.neq(test_y_pred, y))
@@ -306,7 +258,7 @@ def shared_dataset(data_xy, borrow=True):
                                  borrow=borrow)
         return shared_x, T.cast(shared_y, 'int32'), shared_m
 
-def sgd_updates_adadelta(params,cost,rho=0.95,epsilon=1e-6,norm_lim=9,word_vec_name='Words'):
+def sgd_updates_adadelta(params,cost,rho=0.95,epsilon=1e-6,norm_lim=9,word_vec_name='idx_embed'):
     """
     adadelta update rule, mostly from
     https://groups.google.com/forum/#!topic/pylearn-dev/3QbKtCumAW4 (for Adadelta)
@@ -350,7 +302,7 @@ def safe_update(dict_to, dict_from):
         dict_to[key] = val
     return dict_to
 
-def get_idx_from_sent(status, word_idx_map, charged_words, max_l=51, max_s=200, k=300, filter_h=5):
+def get_idx_from_sent(status, word_idx_map, charged_idx_embed, max_l=51, max_s=200, k=300, filter_h=5):
     """
     Transforms sentence into a list of indices. Pad with zeroes.
     """
@@ -364,10 +316,10 @@ def get_idx_from_sent(status, word_idx_map, charged_words, max_l=51, max_s=200, 
     #random : au pire des cas on obtient un x vide alors une boucle while pour eviter ce prob
     while len(x)==0:
         for i in range(length):
-            words = status[i].split()
+            idx_embed = status[i].split()
             if pass_one:
-                words_set = set(words)
-                if len(charged_words.intersection(words_set))==0:
+                idx_embed_set = set(idx_embed)
+                if len(charged_idx_embed.intersection(idx_embed_set))==0:
                     continue
             else:
                 if np.random.randint(0,2)==0:
@@ -375,14 +327,14 @@ def get_idx_from_sent(status, word_idx_map, charged_words, max_l=51, max_s=200, 
             y=[]
             for i in range(pad):
                 y.append(0)
-            for word in words:
+            for word in idx_embed:
                 if word in word_idx_map:
                     y.append(word_idx_map[word])
 
             while len(y) < max_l+2*pad:
                 y.append(0)
             x.append(y)
-        #we are here because of our bad luck : len(x)==0 no need to set the words
+        #we are here because of our bad luck : len(x)==0 no need to set the idx_embed
         pass_one=False
 
     if len(x) < max_s:
@@ -390,14 +342,14 @@ def get_idx_from_sent(status, word_idx_map, charged_words, max_l=51, max_s=200, 
         x.extend([[0]*(max_l+2*pad)]*(max_s-len(x)))
     return x
 
-def make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, cv, per_attr=0, max_l=51, max_s=200, k=300, filter_h=5):
+def make_idx_data_cv(revs, word_idx_map, mairesse, charged_idx_embed, cv, per_attr=0, max_l=51, max_s=200, k=300, filter_h=5):
     """
     Transforms sentences into a 2-d matrix.
     """
     trainX, testX, trainY, testY, mTrain, mTest = [], [], [], [], [], []
     for rev in revs:
         sent = get_idx_from_sent(rev["text"], word_idx_map,
-        charged_words,
+        charged_idx_embed,
         max_l, max_s, k, filter_h)
 
         if rev["split"]==cv:
@@ -443,8 +395,8 @@ if __name__=="__main__":
     ###################################################
     #outputfile :
     ofile=open('perf_output_'+str(attr)+'.txt','w')
-    #list of words when the charged is 1
-    charged_words=[]
+    #list of idx_embed when the charged is 1
+    charged_idx_embed=[]
 
     emof=open("Emotion_Lexicon.csv","rb")
     csvf=csv.reader(emof, delimiter=',',quotechar='"')
@@ -455,17 +407,18 @@ if __name__=="__main__":
             first_line=False
             continue
         if line[11]=="1":
-            charged_words.append(line[0])
+            charged_idx_embed.append(line[0])
 
     emof.close()
 
-    charged_words=set(charged_words)
+    charged_idx_embed=set(charged_idx_embed)
 
     results = []
     #cv fold
     r = range(0,10)
     for i in r:
-        datasets = make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, i, attr, max_l=149, max_s=312, k=300, filter_h=3)
+        #datasets:[trainX, trainY, testX, testY, mTrain, mTest]
+        datasets = make_idx_data_cv(revs, word_idx_map, mairesse, charged_idx_embed, i, attr, max_l=149, max_s=312, k=300, filter_h=3)
 
         perf, fscore = train_conv_net(datasets,
                               U,
