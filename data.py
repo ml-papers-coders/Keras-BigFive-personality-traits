@@ -140,7 +140,6 @@ def load_data(attr,mini_batch_size=50):
         datasets = make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, i, attr, max_l=149, max_s=312, filter_h=3)
         #shuffle dataset and assign to mini batches. if dataset size is not a multiple of mini batches, replicate
         #extra data (at random)
-        print(type(datasets[0]))
         mini_batches_generator=mini_batches(len(datasets[0]),batch_size=mini_batch_size)
         train_mini_batches_idx=np.asarray([],dtype=int)
         val_mini_batches_idx=np.asarray([],dtype=int)
@@ -156,9 +155,9 @@ def load_data(attr,mini_batch_size=50):
                 test_set_x = datasets[2]
                 test_set_y = np.asarray(datasets[3],int)
                 test_set_m = datasets[5]
-                print('before transform idx to embed')
+                #print('Mini-batch load : before transform idx to embed')
                 train_set_x=data_idx2vec(train_set_x)
-                #print(train_set_x.shape)
+                print(train_set_x.shape)
 
         #train_set_x.shape _ (batch,sentences_in_text,words_indexesin sentence) 
 
