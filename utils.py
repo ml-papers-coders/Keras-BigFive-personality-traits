@@ -134,7 +134,7 @@ def load_data(attr,batch_size=50):
         datasets = make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, i, attr, max_l=149, max_s=312, filter_h=3)
         #shuffle dataset and assign to mini batches. if dataset size is not a multiple of mini batches, replicate
         #extra data (at random)
-        type(datasets[0])
+        print(type(datasets[0]))
         from utils import mini_batches
         mini_batches_generator=mini_batches(len(datasets[0]),batch_size=batch_size)
         train_mini_batches_idx=np.asarray([])
