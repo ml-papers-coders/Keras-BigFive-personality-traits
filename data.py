@@ -153,6 +153,7 @@ def load_data(attr,batch_size=50):
         test_set_x = datasets[2]
         test_set_y = np.asarray(datasets[3],int)
         test_set_m = datasets[5]
+        print('before transform idx to embed')
         
         def data_idx2vec(data):
             return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
