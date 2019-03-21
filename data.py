@@ -149,15 +149,19 @@ def load_data(attr,mini_batch_size=50,cv=0,test=False):
             for t,v,_ in mini_batches_generator:
                     #divide train set into train/val sets
                     ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
+                    #reshape (Minibatch,None)
                     train_set_x=datasets[0][t].reshape((t.shape[0],-1))
                     val_set_x=datasets[0][v].reshape((v.shape[0],-1))
                     train_set_y=datasets[1][t].reshape((t.shape[0],-1))
                     val_set_y=datasets[1][v].reshape((v.shape[0],-1))
+                    #list of 84 feature per doc
                     train_set_m=datasets[4][t].reshape((t.shape[0],-1))
                     val_set_m=datasets[4][v].reshape((v.shape[0],-1))
                     #print('Mini-batch load : before transform idx to embed')
                     train_set_x=data_idx2vec(train_set_x)
                     val_set_x=data_idx2vec(val_set_x)
+                    print(train_set_x.shape)
+                    print(train_set_m.shape)
                     yield train_set_x,train_set_y,val_set_x,val_set_y,train_set_m,val_set_m
 
                     # (45, 312, 153, 300)
