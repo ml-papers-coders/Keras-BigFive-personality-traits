@@ -113,7 +113,7 @@ def load_data(attr,mini_batch_size=50,cv=0,test=False):
     
     def data_idx2vec(data):
         print(data.flatten().shape)
-        return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],W.shape[1]))
+        return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
 
     print ("data loaded!")
     charged_words=[]
@@ -150,14 +150,17 @@ def load_data(attr,mini_batch_size=50,cv=0,test=False):
                     #divide train set into train/val sets
                     ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
                     #reshape (Minibatch,None)
-                    print(datasets[0][t].shape)
-                    train_set_x=datasets[0][t].reshape((t.shape[0],-1))
-                    val_set_x=datasets[0][v].reshape((v.shape[0],-1))
-                    train_set_y=datasets[1][t].reshape((t.shape[0],-1))
-                    val_set_y=datasets[1][v].reshape((v.shape[0],-1))
+                    train_set_x=datasets[0][t]
+                    
+                    '''
+                    train_set_x shape :(45, 312, 153)
+                    '''
+                    val_set_x=datasets[0][v]
+                    train_set_y=datasets[1][t]
+                    val_set_y=datasets[1][v]
                     #list of 84 feature per doc
-                    train_set_m=datasets[4][t].reshape((t.shape[0],-1))
-                    val_set_m=datasets[4][v].reshape((v.shape[0],-1))
+                    train_set_m=datasets[4][t]
+                    val_set_m=datasets[4][v]
                     #print('Mini-batch load : before transform idx to embed')
                     print(train_set_x.shape)
                     train_set_x=data_idx2vec(train_set_x)
@@ -168,6 +171,8 @@ def load_data(attr,mini_batch_size=50,cv=0,test=False):
                     (45, 47736, 300)
                     (45, 84) 
                     """
+                    print(train_set_x.shape)
+                    print(train_set_m.shape)
                     yield train_set_x,train_set_y,val_set_x,val_set_y,train_set_m,val_set_m
 
                     # (45, 312, 153, 300)
