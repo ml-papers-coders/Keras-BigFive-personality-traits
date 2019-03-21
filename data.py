@@ -150,6 +150,7 @@ def load_data(attr,mini_batch_size=50,cv=0,test=False):
                     #divide train set into train/val sets
                     ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
                     #reshape (Minibatch,None)
+                    print(datasets[0][t].shape)
                     train_set_x=datasets[0][t].reshape((t.shape[0],-1))
                     val_set_x=datasets[0][v].reshape((v.shape[0],-1))
                     train_set_y=datasets[1][t].reshape((t.shape[0],-1))
