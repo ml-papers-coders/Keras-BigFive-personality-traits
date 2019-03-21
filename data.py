@@ -105,11 +105,16 @@ def mini_batches(data_size,batch_size,test_size=0.1,seed=3435):
         yield (train_batch,test_batch,i+1)
     
 
-def load_data(attr,batch_size=5):
+def load_data(attr,mini_batch_size=5):
     print ("loading data...")
     with open("processed.pkl","rb") as f:
         x = pickle.load(f)
     revs, W, W2, word_idx_map, vocab, mairesse = x[0], x[1], x[2], x[3], x[4], x[5]
+    
+    def data_idx2vec(data):
+        print(data.flatten().shape)
+        return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
+
     print ("data loaded!")
     charged_words=[]
     emof=open("Emotion_Lexicon.csv","r")
@@ -136,32 +141,24 @@ def load_data(attr,batch_size=5):
         #shuffle dataset and assign to mini batches. if dataset size is not a multiple of mini batches, replicate
         #extra data (at random)
         print(type(datasets[0]))
-        mini_batches_generator=mini_batches(len(datasets[0]),batch_size=batch_size)
+        mini_batches_generator=mini_batches(len(datasets[0]),batch_size=mini_batch_size)
         train_mini_batches_idx=np.asarray([],dtype=int)
         val_mini_batches_idx=np.asarray([],dtype=int)
         for t,v,_ in mini_batches_generator:
-            train_mini_batches_idx=np.append(train_mini_batches_idx,t).astype(int)
-            val_mini_batches_idx=np.append(val_mini_batches_idx,v).astype(int)
-        #divide train set into train/val sets
-        ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
-        
-        train_set_x=datasets[0][train_mini_batches_idx]
-        val_set_x=datasets[0][val_mini_batches_idx]
-        train_set_y=datasets[1][train_mini_batches_idx]
-        val_set_y=datasets[1][val_mini_batches_idx]
-        train_set_m=datasets[4][train_mini_batches_idx]
-        val_set_m=datasets[4][val_mini_batches_idx]
-        test_set_x = datasets[2]
-        test_set_y = np.asarray(datasets[3],int)
-        test_set_m = datasets[5]
-        print('before transform idx to embed')
-        
-        def data_idx2vec(data):
-            print(data.flatten().shape)
-            return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
-        train_set_x=data_idx2vec(train_set_x)
-
-        print(train_set_x.shape)
+                #divide train set into train/val sets
+                ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
+                train_set_x=datasets[0][t]
+                val_set_x=datasets[0][v]
+                train_set_y=datasets[1][t]
+                val_set_y=datasets[1][v]
+                train_set_m=datasets[4][t]
+                val_set_m=datasets[4][v]
+                test_set_x = datasets[2]
+                test_set_y = np.asarray(datasets[3],int)
+                test_set_m = datasets[5]
+                print('before transform idx to embed')
+                train_set_x=data_idx2vec(train_set_x)
+                print(train_set_x.shape)
 
         #train_set_x.shape _ (batch,sentences_in_text,words_indexesin sentence) 
 
