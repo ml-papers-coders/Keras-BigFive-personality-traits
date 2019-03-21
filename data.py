@@ -166,4 +166,4 @@ def load_data(attr,mini_batch_size=50,cv=0,test=False):
 
                     # (45, 312, 153, 300)
                     #(batch,sentences_in_text,words_indexesin sentence)
-load_data(2)
+next(load_data(2))

@@ -22,8 +22,7 @@ docs_size=312
 Model=BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=filter_hs,docs_size=docs_size)
 
 print(Model.summary())
-from tensorflow.keras.utils import plot_model
-plot_model(Model(inputs=inputLayer,outputs=outputLayer), to_file='model.png')
+
 
 """
 from tensorflow.keras.utils import plot_model
