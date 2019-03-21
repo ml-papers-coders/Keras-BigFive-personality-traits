@@ -137,11 +137,11 @@ def load_data(attr,batch_size=50):
         print(type(datasets[0]))
         from utils import mini_batches
         mini_batches_generator=mini_batches(len(datasets[0]),batch_size=batch_size)
-        train_mini_batches_idx=np.asarray([])
-        val_mini_batches_idx=np.asarray([])
+        train_mini_batches_idx=np.asarray([],dtype=int)
+        val_mini_batches_idx=np.asarray([],dtype=int)
         for t,v,_ in mini_batches_generator:
-            train_mini_batches_idx=np.append(train_mini_batches_idx,t)
-            val_mini_batches_idx=np.append(val_mini_batches_idx,v)
+            train_mini_batches_idx=np.append(train_mini_batches_idx,t).astype(int)
+            val_mini_batches_idx=np.append(val_mini_batches_idx,v).astype(int)
         #divide train set into train/val sets
         ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
         
