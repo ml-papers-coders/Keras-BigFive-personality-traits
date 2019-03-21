@@ -105,7 +105,7 @@ def mini_batches(data_size,batch_size,test_size=0.1,seed=3435):
         yield (train_batch,test_batch,i+1)
     
 
-def load_data(attr,mini_batch_size=50):
+def load_data(attr,mini_batch_size=50,cv=0,test=False):
     print ("loading data...")
     with open("processed.pkl","rb") as f:
         x = pickle.load(f)
@@ -134,30 +134,32 @@ def load_data(attr,mini_batch_size=50):
 
     results = []
     #cv fold
-    r = range(0,10)
-    for i in r[:1]:
-        #datasets:[trainX, trainY, testX, testY, mTrain, mTest]
-        datasets = make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, i, attr, max_l=149, max_s=312, filter_h=3)
+    if cv <11:
+        #datasets:[fortrainX, trainY, testX, testY, mTrain, mTest]
+        datasets = make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, cv, attr, max_l=149, max_s=312, filter_h=3)
         #shuffle dataset and assign to mini batches. if dataset size is not a multiple of mini batches, replicate
         #extra data (at random)
-        mini_batches_generator=mini_batches(len(datasets[0]),batch_size=mini_batch_size)
-        train_mini_batches_idx=np.asarray([],dtype=int)
-        val_mini_batches_idx=np.asarray([],dtype=int)
-        for t,v,_ in mini_batches_generator:
-                #divide train set into train/val sets
-                ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
-                train_set_x=datasets[0][t].reshape((t.shape[0],-1))
-                val_set_x=datasets[0][v].reshape((v.shape[0],-1))
-                train_set_y=datasets[1][t].reshape((t.shape[0],-1))
-                val_set_y=datasets[1][v].reshape((v.shape[0],-1))
-                train_set_m=datasets[4][t].reshape((t.shape[0],-1))
-                val_set_m=datasets[4][v].reshape((v.shape[0],-1))
-                test_set_x = datasets[2].reshape((datasets[2].shape[0],-1))
-                test_set_y = np.asarray(datasets[3],int).reshape((datasets[3].shape[0],-1))
-                test_set_m = datasets[5].reshape((datasets[5].shape[0],-1))
-                #print('Mini-batch load : before transform idx to embed')
-                train_set_x=data_idx2vec(train_set_x)
-                print(train_set_x.shape)
-                # (45, 312, 153, 300)
-                #(batch,sentences_in_text,words_indexesin sentence)
+        if test==True:
+            test_set_x = datasets[2].reshape((datasets[2].shape[0],-1))
+            test_set_y = np.asarray(datasets[3],int).reshape((datasets[3].shape[0],-1))
+            test_set_m = datasets[5].reshape((datasets[5].shape[0],-1))
+            yield test_set_x,test_set_y,test_set_m
+        else:
+            mini_batches_generator=mini_batches(len(datasets[0]),batch_size=mini_batch_size)
+            for t,v,_ in mini_batches_generator:
+                    #divide train set into train/val sets
+                    ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
+                    train_set_x=datasets[0][t].reshape((t.shape[0],-1))
+                    val_set_x=datasets[0][v].reshape((v.shape[0],-1))
+                    train_set_y=datasets[1][t].reshape((t.shape[0],-1))
+                    val_set_y=datasets[1][v].reshape((v.shape[0],-1))
+                    train_set_m=datasets[4][t].reshape((t.shape[0],-1))
+                    val_set_m=datasets[4][v].reshape((v.shape[0],-1))
+                    #print('Mini-batch load : before transform idx to embed')
+                    train_set_x=data_idx2vec(train_set_x)
+                    val_set_x=data_idx2vec(val_set_x)
+                    yield train_set_x,train_set_y,val_set_x,val_set_y,train_set_m,val_set_m
+
+                    # (45, 312, 153, 300)
+                    #(batch,sentences_in_text,words_indexesin sentence)
 load_data(2)
