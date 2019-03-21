@@ -152,7 +152,7 @@ def load_data(attr,mini_batch_size=50):
                 val_set_y=datasets[1][v].reshape((v.shape[0],-1))
                 train_set_m=datasets[4][t].reshape((t.shape[0],-1))
                 val_set_m=datasets[4][v].reshape((v.shape[0],-1))
-                test_set_x = datasets[2].reshape((t.shape[0],-1))
+                test_set_x = datasets[2].reshape((datasets[2].shape[0],-1))
                 test_set_y = np.asarray(datasets[3],int).reshape((datasets[3].shape[0],-1))
                 test_set_m = datasets[5].reshape((datasets[5].shape[0],-1))
                 #print('Mini-batch load : before transform idx to embed')
