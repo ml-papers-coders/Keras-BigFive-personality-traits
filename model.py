@@ -2,7 +2,7 @@ from tensorflow.keras.models import Sequential,Model
 from tensorflow.keras.layers import Dense, Activation ,Conv2D,MaxPooling2D , Input,Concatenate, Reshape,Flatten,Dense
 
 
-def SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,2,3],hidden_units=200,conv_non_linear='relu'):
+def SentenceLevel(filter_shapes,pool_sizes,input_shape=(312*153,300,1),filter_hs=[1,2,3],hidden_units=200,conv_non_linear='relu'):
     """
     Apply a convolutional filter on EACH SENTENCE : => filter (n,E) on (W,E)
     (nb_words,E,1=channel)
@@ -14,11 +14,12 @@ def SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,
     for i in range(len(filter_hs)):
         #print('layer'+str(i))
         filter_shape = filter_shapes[i] # ({1,2,3},300) (h,w)
-        pool_size = pool_sizes[i] # img_h-filter_h+1,img_w-filter_w+1
+        pool_size = pool_sizes[i] # S*(img_h-filter_h+1),img_w-filter_w+1
         layer=Conv2D(filters=feature_maps,kernel_size=filter_shape,activation=conv_non_linear)(model_input_layer)
+        print("Conv:LAYER "+str(i)+': input='+str(layer.shape)+' // output= '+str(layer.shape))
         layer=MaxPooling2D(pool_size=pool_size)(layer)
         layers.append(layer)
-        print("LAYER "+str(i))
+        print("MAXPOOL:LAYER "+str(i)+': input='+str(layer.shape)+' // output= '+str(layer.shape))
     """
     for i in range(len(filter_hs)):
         print(Model(inputs=model_input_layer,outputs=layers[i]).summary())
@@ -39,9 +40,10 @@ def DocumentLevel(sentlevel,hidden_units,docs_size=312):
     output=Dense(hidden_units[1],activation="softmax")(output)
     return Model(inputs=[sentlevel.input,m_features],outputs=output)
 
-def BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,2,3],hidden_units=[200,200,2],conv_non_linear='relu',docs_size=312):
+def BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=(312*153,300,1),filter_hs=[1,2,3],hidden_units=[200,200,2],conv_non_linear='relu',docs_size=312):
     """
     input : W X E (batch = D X S)
+    input_shape=(S*W,E,1)
     """
     SentModel=SentenceLevel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs,hidden_units=hidden_units[0])
     model=DocumentLevel(SentModel,hidden_units=hidden_units[1:],docs_size=docs_size)

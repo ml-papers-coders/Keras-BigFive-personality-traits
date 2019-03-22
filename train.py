@@ -36,7 +36,7 @@ def train(attr=2):
     pool_sizes = []
     for filter_h in filter_hs:
         filter_shapes.append((filter_h, E))
-        pool_sizes.append((W-filter_h+1,1))
+        pool_sizes.append((S*(W-filter_h+1),1))
     model=BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size)
     model.summary()
     model.compile(loss=nll1,optimizer="adadelta")

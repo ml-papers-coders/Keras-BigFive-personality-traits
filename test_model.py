@@ -15,11 +15,11 @@ filter_shapes = []
 pool_sizes = []
 for filter_h in filter_hs:
     filter_shapes.append((filter_h,filter_w))
-    pool_sizes.append((img_h-filter_h+1,img_w-filter_w+1))
+    pool_sizes.append((312*(img_h-filter_h+1),img_w-filter_w+1))
 #input_shape=(312,153, 300) : nb_sents X nb_words X E
 #Batch : (batch=nb_docs)*nb sentences
 docs_size=312
-Model=BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=filter_hs,docs_size=docs_size)
+Model=BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=(312*153,300,1),filter_hs=filter_hs,docs_size=docs_size)
 
 print(Model.summary())
 
