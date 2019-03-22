@@ -18,6 +18,7 @@ def SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,
         layer=Conv2D(filters=feature_maps,kernel_size=filter_shape,activation=conv_non_linear)(model_input_layer)
         layer=MaxPooling2D(pool_size=pool_size)(layer)
         layers.append(layer)
+        print("LAYER "+str(i))
     """
     for i in range(len(filter_hs)):
         print(Model(inputs=model_input_layer,outputs=layers[i]).summary())
