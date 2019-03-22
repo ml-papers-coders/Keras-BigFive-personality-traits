@@ -38,6 +38,9 @@ def DocumentLevel(sentlevel,docs_size=312):
     return Model(inputs=[sentlevel.input,m_features],outputs=output)
 
 def BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,2,3],hidden_units=[200,200,2],conv_non_linear='relu',docs_size=312):
+    """
+    input : W X E (batch = D X S)
+    """
     SentModel=SentenceLevel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs)
     model=DocumentLevel(SentModel,docs_size)
     return model

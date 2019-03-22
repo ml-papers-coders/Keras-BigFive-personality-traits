@@ -162,19 +162,17 @@ def load_data(attr,mini_batch_size=50,cv=0,test=False):
                     train_set_m=datasets[4][t]
                     val_set_m=datasets[4][v]
                     #print('Mini-batch load : before transform idx to embed')
-                    print(train_set_x.shape)
+                    #print(train_set_x.shape)
                     train_set_x=data_idx2vec(train_set_x)
                     val_set_x=data_idx2vec(val_set_x)
                     """
                     print(train_set_x.shape)
                     print(train_set_m.shape)
-                    (45, 47736, 300)
-                    (45, 84) 
+                    (45, 312, 153, 300)
+                    (45, 84)
                     """
-                    print(train_set_x.shape)
-                    print(train_set_m.shape)
                     yield train_set_x,train_set_y,val_set_x,val_set_y,train_set_m,val_set_m
 
                     # (45, 312, 153, 300)
                     #(batch,sentences_in_text,words_indexesin sentence)
-next(load_data(2))
+#next(load_data(2))
