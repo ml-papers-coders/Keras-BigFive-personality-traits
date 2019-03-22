@@ -134,7 +134,7 @@ def test_data_generator(attr):
     yield test_set_x,test_set_y,test_set_m
 
 def data_generator(attr,reshape,val=False):
-    W,E=reshape
+    _W,_E=reshape
     mini_batch_size=50
     revs, W, W2, word_idx_map, vocab, mairesse ,charged_words=load_data(attr,mini_batch_size=50)
     #datasets:[fortrainX, trainY, testX, testY, mTrain, mTest]
@@ -161,7 +161,7 @@ def data_generator(attr,reshape,val=False):
                 train_set_x=data_idx2vec(train_set_x,W)
                 print(train_set_x.shape)
                 print(train_set_x.dtype)
-                train_set_x=train_set_x.reshape((-1,W,E,1))
+                train_set_x=train_set_x.reshape((-1,_W,_E,1))
                 
                 """
                 print(train_set_x.shape)
@@ -173,7 +173,7 @@ def data_generator(attr,reshape,val=False):
             if val==True:
                 val_set_x=datasets[0][v]
                 val_set_y=datasets[1][v].reshape((-1,1))
-                val_set_x=data_idx2vec(val_set_x,W).reshape((-1,W,E,1))
+                val_set_x=data_idx2vec(val_set_x,W).reshape((-1,_W,_E,1))
                 val_set_m=datasets[4][v].reshape((-1,84))
 
                 yield [val_set_x,val_set_m],val_set_y
