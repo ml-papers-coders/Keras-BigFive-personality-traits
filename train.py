@@ -1,6 +1,7 @@
 from model import BigFiveCnnModel
 from data import data_generator
 from tensorflow.keras import backend as K
+import tensorflow as tf
 
 def nll1(y_true, y_pred):
     """ Negative log likelihood. """
@@ -12,7 +13,7 @@ def nll1(y_true, y_pred):
 def nll2(y_true, y_pred):
     """ Negative log likelihood. """
 
-    likelihood = K.tf.distributions.Bernoulli(probs=y_pred)
+    likelihood = tf.distributions.Bernoulli(probs=y_pred)
 
     return - K.sum(likelihood.log_prob(y_true), axis=-1)
 

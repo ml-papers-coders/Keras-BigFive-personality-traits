@@ -9,8 +9,7 @@ def SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,
     """
     #nb_words,emb_dim=input_shape
     feature_maps = hidden_units #nb FM
-    model_input_layer=Reshape((input_shape))
-    #input_layer= Input(shape=(input_shape))(model_input_layer)
+    model_input_layer= Input(shape=(input_shape))
     layers=[]
     for i in range(len(filter_hs)):
         #print('layer'+str(i))
@@ -28,7 +27,7 @@ def SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,
     
     return Model(inputs=model_input_layer,outputs=concat_layer)
 
-def DocumentLevel(sentlevel,docs_size=312,hidden_units=[200,2]):
+def DocumentLevel(sentlevel,hidden_units,docs_size=312):
     # batch*docs X 1 X 1 X sentVec to batch X docs X sentVec
     output=Reshape((docs_size,sentlevel.output.shape[-1]))(sentlevel.output)
     # list of 84 M features per doc
@@ -43,5 +42,5 @@ def BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[
     input : W X E (batch = D X S)
     """
     SentModel=SentenceLevel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs,hidden_units=hidden_units[0])
-    model=DocumentLevel(SentModel,docs_size,hidden_units=hidden_units[1:])
+    model=DocumentLevel(SentModel,hidden_units=hidden_units[1:],docs_size=docs_size)
     return model

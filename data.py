@@ -133,7 +133,8 @@ def test_data_generator(attr):
     test_set_m = datasets[5]
     yield test_set_x,test_set_y,test_set_m
 
-def data_generator(attr,val=False):
+def data_generator(attr,reshape,val=False):
+    W,E=reshape
     mini_batch_size=50
     revs, W, W2, word_idx_map, vocab, mairesse ,charged_words=load_data(attr,mini_batch_size=50)
     #datasets:[fortrainX, trainY, testX, testY, mTrain, mTest]
@@ -151,12 +152,12 @@ def data_generator(attr,val=False):
                 '''
                 train_set_x shape :(45, 312, 153)
                 '''
-                train_set_y=datasets[1][t]
+                train_set_y=datasets[1][t].reshape((-1,1)) # -1 W,E,1
                 #list of 84 feature per doc
-                train_set_m=datasets[4][t]
+                train_set_m=datasets[4][t].reshape((-1,84))
                 #print('Mini-batch load : before transform idx to embed')
                 #print(train_set_x.shape)
-                train_set_x=data_idx2vec(train_set_x,W)
+                train_set_x=data_idx2vec(train_set_x,W).reshape((-1,W,E,1))
                 
                 """
                 print(train_set_x.shape)
@@ -167,9 +168,9 @@ def data_generator(attr,val=False):
                 yield train_set_x,train_set_y,train_set_m
             if val==True:
                 val_set_x=datasets[0][v]
-                val_set_y=datasets[1][v]
-                val_set_x=data_idx2vec(val_set_x,W)
-                val_set_m=datasets[4][v]
+                val_set_y=datasets[1][v].reshape((-1,1))
+                val_set_x=data_idx2vec(val_set_x,W).reshape((-1,W,E,1))
+                val_set_m=datasets[4][v].reshape((-1,84))
 
                 yield val_set_x,val_set_y,val_set_m
 
