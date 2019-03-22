@@ -2,13 +2,13 @@ from tensorflow.keras.models import Sequential,Model
 from tensorflow.keras.layers import Dense, Activation ,Conv2D,MaxPooling2D , Input,Concatenate, Reshape,Flatten,Dense
 
 
-def SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,2,3],hidden_units=[200,200,2],conv_non_linear='relu'):
+def SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,2,3],hidden_units=200,conv_non_linear='relu'):
     """
     Apply a convolutional filter on EACH SENTENCE : => filter (n,E) on (W,E)
     (nb_words,E,1=channel)
     """
     #nb_words,emb_dim=input_shape
-    feature_maps = hidden_units[0] #nb FM
+    feature_maps = hidden_units #nb FM
     model_input_layer=Reshape((input_shape))
     input_layer= Input(shape=(input_shape))(model_input_layer)
     layers=[]
