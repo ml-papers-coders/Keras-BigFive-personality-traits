@@ -42,7 +42,7 @@ def train(attr=2):
     model.compile(loss=nll1,optimizer="adadelta")
     train_data_generator=data_generator(attr,reshape=(W,E))
     val_data_generator=data_generator(attr,val=False,reshape=(W,E))
-    model.fit_generator(generator=train_data_generator,epochs=50,validation_data=val_data_generator,steps_per_epoch=50)
+    model.fit_generator(generator=train_data_generator,epochs=50,validation_data=val_data_generator,steps_per_epoch=50,validation_steps=1)
     return model
 
     
