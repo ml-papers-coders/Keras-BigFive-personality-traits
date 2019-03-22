@@ -157,9 +157,10 @@ def data_generator(attr,reshape,val=False):
                 train_set_m=datasets[4][t].reshape((-1,84))
                 #print('Mini-batch load : before transform idx to embed')
                 #print(train_set_x.shape)
-                print(train_set_x.dtype)
+                #print(train_set_x.dtype) int64
                 train_set_x=data_idx2vec(train_set_x,W)
                 print(train_set_x.shape)
+                print(train_set_x.dype)
                 train_set_x=train_set_x.reshape((-1,W,E,1))
                 
                 """
