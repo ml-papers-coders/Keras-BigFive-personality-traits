@@ -160,7 +160,7 @@ def data_generator(attr,reshape,val=False):
                 #print(train_set_x.dtype) int64
                 train_set_x=data_idx2vec(train_set_x,W)
                 print(train_set_x.shape)
-                print(train_set_x.dype)
+                print(train_set_x.dtype)
                 train_set_x=train_set_x.reshape((-1,W,E,1))
                 
                 """
