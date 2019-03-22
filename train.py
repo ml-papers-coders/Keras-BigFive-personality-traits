@@ -1,5 +1,5 @@
 from model import BigFiveCnnModel
-from data import load_data
+from data import data_generator
 from tensorflow.keras import backend as K
 
 def nll1(y_true, y_pred):
@@ -19,15 +19,14 @@ def nll2(y_true, y_pred):
 def train(attr=2):
     #data generator
     #load first mini-batch
-    train_set_x,train_set_y,val_set_x,val_set_y,train_set_m,val_set_m=next(load_data(attr,cv=0))
     """
     train_set_x (45, 312, 153, 300)
     """
     #Model config 
-    D=train_set_x.shape[0]
-    S=train_set_x.shape[1]
-    W=train_set_x.shape[2]
-    E=train_set_x.shape[3]
+    D=45#train_set_x.shape[0]
+    S=312#train_set_x.shape[1]
+    W=153#train_set_x.shape[2]
+    E=300#train_set_x.shape[3]
     input_shape=(S,W,1)
     docs_size=S
     hidden_units=[200,200,2]
@@ -39,7 +38,10 @@ def train(attr=2):
         pool_sizes.append((S-filter_h+1,1))
     model=BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size)
     model.compile(loss=nll1,optimizer="adadelta")
-    
+    train_data_generator=next(data_generator(attr))
+    val_data_generator=next(data_generator(attr,val=False))
+    model.fit_generator(generator=train_data_generator,epochs=50,validation_data=val_data_generator)
+    return model
 
     
     

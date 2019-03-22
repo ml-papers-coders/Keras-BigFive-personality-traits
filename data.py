@@ -96,15 +96,11 @@ def mini_batches(data_size,batch_size,test_size=0.1,seed=3435):
         yield (train_batch,test_batch,i+1)
     
 
-def load_data(attr,mini_batch_size=50,test=False):
+def load_data(attr,mini_batch_size=50):
     print ("loading data...")
     with open("processed.pkl","rb") as f:
         x = pickle.load(f)
     revs, W, W2, word_idx_map, vocab, mairesse = x[0], x[1], x[2], x[3], x[4], x[5]
-    
-    def data_idx2vec(data):
-        print(data.flatten().shape)
-        return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
 
     print ("data loaded!")
     charged_words=[]
@@ -123,45 +119,61 @@ def load_data(attr,mini_batch_size=50,test=False):
 
     charged_words=set(charged_words)
 
-    results = []
+    return revs, W, W2, word_idx_map, vocab, mairesse ,charged_words
+
+def data_idx2vec(data,W):
+    print(data.flatten().shape)
+    return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
+
+def test_data_generator(attr):
+    revs, W, W2, word_idx_map, vocab, mairesse ,charged_words=load_data(attr,mini_batch_size=50)
+    datasets = make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, attr, max_l=149, max_s=312, filter_h=3)
+    test_set_x = datasets[2]
+    test_set_y = np.asarray(datasets[3],int)
+    test_set_m = datasets[5]
+    yield test_set_x,test_set_y,test_set_m
+
+def data_generator(attr,val=False):
+    mini_batch_size=50
+    revs, W, W2, word_idx_map, vocab, mairesse ,charged_words=load_data(attr,mini_batch_size=50)
     #datasets:[fortrainX, trainY, testX, testY, mTrain, mTest]
     datasets = make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, attr, max_l=149, max_s=312, filter_h=3)
     #shuffle dataset and assign to mini batches. if dataset size is not a multiple of mini batches, replicate
     #extra data (at random)
-    if test==True:
-        test_set_x = datasets[2]
-        test_set_y = np.asarray(datasets[3],int)
-        test_set_m = datasets[5]
-        yield test_set_x,test_set_y,test_set_m
-    else:
-        mini_batches_generator=mini_batches(len(datasets[0]),batch_size=mini_batch_size)
-        for t,v,_ in mini_batches_generator:
-                #divide train set into train/val sets
-                ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
-                #reshape (Minibatch,None)
+    mini_batches_generator=mini_batches(len(datasets[0]),batch_size=mini_batch_size)
+    for t,v,_ in mini_batches_generator:
+            #divide train set into train/val sets
+            ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
+            #reshape (Minibatch,None)
+            if val ==False:
                 train_set_x=datasets[0][t]
                 
                 '''
                 train_set_x shape :(45, 312, 153)
                 '''
-                val_set_x=datasets[0][v]
                 train_set_y=datasets[1][t]
-                val_set_y=datasets[1][v]
                 #list of 84 feature per doc
                 train_set_m=datasets[4][t]
-                val_set_m=datasets[4][v]
                 #print('Mini-batch load : before transform idx to embed')
                 #print(train_set_x.shape)
-                train_set_x=data_idx2vec(train_set_x)
-                val_set_x=data_idx2vec(val_set_x)
+                train_set_x=data_idx2vec(train_set_x,W)
+                
                 """
                 print(train_set_x.shape)
                 print(train_set_m.shape)
                 (45, 312, 153, 300)
                 (45, 84)
                 """
-                yield train_set_x,train_set_y,val_set_x,val_set_y,train_set_m,val_set_m
+                yield train_set_x,train_set_y,train_set_m
+            if val==True:
+                val_set_x=datasets[0][v]
+                val_set_y=datasets[1][v]
+                val_set_x=data_idx2vec(val_set_x,W)
+                val_set_m=datasets[4][v]
+
+                yield val_set_x,val_set_y,val_set_m
 
                 # (45, 312, 153, 300)
                 #(batch,sentences_in_text,words_indexesin sentence)
-#next(load_data(2))
+
+next(load_data(2))
