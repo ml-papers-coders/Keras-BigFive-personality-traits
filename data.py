@@ -176,4 +176,3 @@ def data_generator(attr,val=False):
                 # (45, 312, 153, 300)
                 #(batch,sentences_in_text,words_indexesin sentence)
 
-next(load_data(2))
