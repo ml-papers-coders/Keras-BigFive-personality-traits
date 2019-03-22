@@ -43,7 +43,7 @@ def get_idx_from_sent(status, word_idx_map, charged_words, max_l=51, max_s=200, 
 
 def make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, per_attr=0, max_l=51, max_s=200, filter_h=5):
     """
-    Transforms sentences into a 2-d matrix.
+    Transforms sentences into a 2-d matrix. of word indx
     """
     trainX, testX, trainY, testY, mTrain, mTest = [], [], [], [], [], []
     for rev in revs:
@@ -157,6 +157,7 @@ def data_generator(attr,reshape,val=False):
                 train_set_m=datasets[4][t].reshape((-1,84))
                 #print('Mini-batch load : before transform idx to embed')
                 #print(train_set_x.shape)
+                print(train_set_x.dtype)
                 train_set_x=data_idx2vec(train_set_x,W).reshape((-1,W,E,1))
                 
                 """
