@@ -28,7 +28,7 @@ def train(attr=2):
     S=312#train_set_x.shape[1]
     W=153#train_set_x.shape[2]
     E=300#train_set_x.shape[3]
-    input_shape=(S,W,1)
+    input_shape=(W,E,1)
     docs_size=S
     hidden_units=[200,200,2]
     filter_hs=[1,2,3]
@@ -38,9 +38,10 @@ def train(attr=2):
         filter_shapes.append((filter_h, E))
         pool_sizes.append((S-filter_h+1,1))
     model=BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size)
+    model.summary()
     model.compile(loss=nll1,optimizer="adadelta")
-    train_data_generator=next(data_generator(attr))
-    val_data_generator=next(data_generator(attr,val=False))
+    train_data_generator=next(data_generator(attr,reshape=(W,E)))
+    val_data_generator=next(data_generator(attr,val=False,reshape=(W,E)))
     model.fit_generator(generator=train_data_generator,epochs=50,validation_data=val_data_generator)
     return model
 
