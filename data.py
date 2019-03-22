@@ -123,7 +123,7 @@ def load_data(attr,mini_batch_size=50):
 
 def data_idx2vec(data,W):
     print(data.flatten().shape)
-    return W[np.array(data.flatten(),dtype="int32")].reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
+    return np.asarray(W[np.array(data.flatten(),dtype="int32")]).reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
 
 def test_data_generator(attr):
     revs, W, W2, word_idx_map, vocab, mairesse ,charged_words=load_data(attr,mini_batch_size=50)
