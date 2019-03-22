@@ -173,4 +173,4 @@ if __name__=="__main__":
     mairesse = get_mairesse_features(mairesse_file)
     cPickle.dump([revs, W, W2, word_idx_map, vocab, mairesse], open("processed.pkl", "wb"))
     print( "dataset created!")
-
+    

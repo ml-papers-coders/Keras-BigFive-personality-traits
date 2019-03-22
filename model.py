@@ -30,9 +30,10 @@ def SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,
 
 def DocumentLevel(sentlevel,hidden_units,docs_size=312):
     # batch*docs X 1 X 1 X sentVec to batch X docs X sentVec
-    output=Reshape((docs_size,sentlevel.output.shape[-1]))(sentlevel.output)
+    #print(sentlevel.output.shape[-1])
+    output=Reshape((sentlevel.output.shape[-1],))(sentlevel.output)
     # list of 84 M features per doc
-    m_features=Input(shape=(docs_size,84))
+    m_features=Input(shape=(84,))
     output=Concatenate()([output,m_features])
     output=Dense(hidden_units[0],activation='softmax')(output)
     output=Dense(hidden_units[1],activation="softmax")(output)
