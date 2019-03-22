@@ -165,14 +165,14 @@ def data_generator(attr,reshape,val=False):
                 (45, 312, 153, 300)
                 (45, 84)
                 """
-                yield train_set_x,train_set_y,train_set_m
+                yield [train_set_x,train_set_m],train_set_y
             if val==True:
                 val_set_x=datasets[0][v]
                 val_set_y=datasets[1][v].reshape((-1,1))
                 val_set_x=data_idx2vec(val_set_x,W).reshape((-1,W,E,1))
                 val_set_m=datasets[4][v].reshape((-1,84))
 
-                yield val_set_x,val_set_y,val_set_m
+                yield [val_set_x,val_set_m],val_set_y
 
                 # (45, 312, 153, 300)
                 #(batch,sentences_in_text,words_indexesin sentence)
