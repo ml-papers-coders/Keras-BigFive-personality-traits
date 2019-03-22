@@ -13,5 +13,5 @@ def train(attr=2):
     W=train_set_x[0][0].shape    
     print(S)
     print(W)
-
+train()
 
