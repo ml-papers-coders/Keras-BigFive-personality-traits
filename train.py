@@ -40,8 +40,8 @@ def train(attr=2):
     model=BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size)
     model.summary()
     model.compile(loss=nll1,optimizer="adadelta")
-    train_data_generator=data_generator(attr,reshape=(W,E))
-    val_data_generator=data_generator(attr,val=False,reshape=(W,E))
+    train_data_generator=data_generator(attr,reshape=(S,W,E))
+    val_data_generator=data_generator(attr,val=False,reshape=(S,W,E))
     model.fit_generator(generator=train_data_generator,epochs=5,validation_data=val_data_generator,steps_per_epoch=1,validation_steps=1)
     return model
 
