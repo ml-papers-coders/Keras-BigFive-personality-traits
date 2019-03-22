@@ -10,7 +10,7 @@ def SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,
     #nb_words,emb_dim=input_shape
     feature_maps = hidden_units #nb FM
     model_input_layer=Reshape((input_shape))
-    input_layer= Input(shape=(input_shape))(model_input_layer)
+    #input_layer= Input(shape=(input_shape))(model_input_layer)
     layers=[]
     for i in range(len(filter_hs)):
         #print('layer'+str(i))
