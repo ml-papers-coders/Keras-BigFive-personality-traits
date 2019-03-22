@@ -1,5 +1,20 @@
 from model import BigFiveCnnModel
 from data import load_data
+from tensorflow.keras import backend as K
+
+def nll1(y_true, y_pred):
+    """ Negative log likelihood. """
+
+    # keras.losses.binary_crossentropy give the mean
+    # over the last axis. we require the sum
+    return K.sum(K.binary_crossentropy(y_true, y_pred), axis=-1)
+
+def nll2(y_true, y_pred):
+    """ Negative log likelihood. """
+
+    likelihood = K.tf.distributions.Bernoulli(probs=y_pred)
+
+    return - K.sum(likelihood.log_prob(y_true), axis=-1)
 
 def train(attr=2):
     #data generator
@@ -8,10 +23,28 @@ def train(attr=2):
     """
     train_set_x (45, 312, 153, 300)
     """
+    #Model config 
+    D=train_set_x.shape[0]
+    S=train_set_x.shape[1]
+    W=train_set_x.shape[2]
+    E=train_set_x.shape[3]
+    input_shape=(S,W,1)
+    docs_size=S
+    hidden_units=[200,200,2]
+    filter_hs=[1,2,3]
+    filter_shapes = []
+    pool_sizes = []
+    for filter_h in filter_hs:
+        filter_shapes.append((filter_h, E))
+        pool_sizes.append((S-filter_h+1,1))
+    model=BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size)
+    model.compile(loss=nll1,optimizer="adadelta")
+    
 
-    S=train_set_x[0].shape
-    W=train_set_x[0][0].shape    
-    print(S)
-    print(W)
+    
+    
+    
+        
+    
 train()
 

@@ -7,7 +7,7 @@ import csv
 import gensim
 
 
-def build_data_cv(datafile, cv=10, clean_string=True):
+def build_data_cv(datafile, clean_string=True):
     """
     Loads data and split into 10 folds.
     """
@@ -69,8 +69,9 @@ def build_data_cv(datafile, cv=10, clean_string=True):
                   "y4":1 if line[6].lower()=='y' else 0,
                   "text": status,
                   "user": line[0],
-                  "num_words": np.max([len(sent.split()) for sent in status]),
-                  "split": np.random.randint(0,cv)}
+                  "num_words": np.max([len(sent.split()) for sent in status])
+                  #, "split": np.random.randint(0,cv)
+                  }
             revs.append(datum)
 
 
@@ -153,7 +154,7 @@ if __name__=="__main__":
     data_folder = sys.argv[2]
     mairesse_file = sys.argv[3]
     print ("loading data...")
-    revs, vocab = build_data_cv(data_folder, cv=10, clean_string=True)
+    revs, vocab = build_data_cv(data_folder, clean_string=True)
     num_words=pd.DataFrame(revs)["num_words"]
     max_l = np.max(num_words)
     print( "data loaded!")

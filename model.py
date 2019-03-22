@@ -27,20 +27,20 @@ def SentenceLevel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,
     
     return Model(inputs=model_input_layer,outputs=concat_layer)
 
-def DocumentLevel(sentlevel,docs_size=312):
+def DocumentLevel(sentlevel,docs_size=312,hidden_units=[200,2]):
     # batch*docs X 1 X 1 X sentVec to batch X docs X sentVec
     output=Reshape((docs_size,sentlevel.output.shape[-1]))(sentlevel.output)
     # list of 84 M features per doc
     m_features=Input(shape=(docs_size,84))
     output=Concatenate()([output,m_features])
-    output=Dense(200,activation='softmax')(output)
-    output=Dense(2,activation="softmax")(output)
+    output=Dense(hidden_units[0],activation='softmax')(output)
+    output=Dense(hidden_units[1],activation="softmax")(output)
     return Model(inputs=[sentlevel.input,m_features],outputs=output)
 
 def BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=(153,300,1),filter_hs=[1,2,3],hidden_units=[200,200,2],conv_non_linear='relu',docs_size=312):
     """
     input : W X E (batch = D X S)
     """
-    SentModel=SentenceLevel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs)
-    model=DocumentLevel(SentModel,docs_size)
+    SentModel=SentenceLevel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs,hidden_units=hidden_units[0])
+    model=DocumentLevel(SentModel,docs_size,hidden_units=hidden_units[1:])
     return model

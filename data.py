@@ -23,10 +23,6 @@ def get_idx_from_sent(status, word_idx_map, charged_words, max_l=51, max_s=200, 
                 words_set = set(words)
                 if len(charged_words.intersection(words_set))==0:
                     continue
-            else:
-                #randomly pass same sentences
-                if np.random.randint(0,2)==0:
-                    continue
             y=[]
             for i in range(pad):
                 y.append(0)
@@ -45,7 +41,7 @@ def get_idx_from_sent(status, word_idx_map, charged_words, max_l=51, max_s=200, 
         x.extend([[0]*(max_l+2*pad)]*(max_s-len(x)))
     return x
 
-def make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, cv, per_attr=0, max_l=51, max_s=200, filter_h=5):
+def make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, per_attr=0, max_l=51, max_s=200, filter_h=5):
     """
     Transforms sentences into a 2-d matrix.
     """
@@ -54,15 +50,10 @@ def make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, cv, per_attr=0
         sent = get_idx_from_sent(rev["text"], word_idx_map,
         charged_words,
         max_l, max_s, filter_h)
-
-        if rev["split"]==cv:
-            testX.append(sent)
-            testY.append(rev['y'+str(per_attr)])
-            mTest.append(mairesse[rev["user"]])
-        else:
-            trainX.append(sent)
-            trainY.append(rev['y'+str(per_attr)])
-            mTrain.append(mairesse[rev["user"]])
+        
+        trainX.append(sent)
+        trainY.append(rev['y'+str(per_attr)])
+        mTrain.append(mairesse[rev["user"]])
     trainX = np.array(trainX,dtype=int)
     testX = np.array(testX,dtype=int)
     trainY = np.array(trainY,dtype=int)
@@ -105,7 +96,7 @@ def mini_batches(data_size,batch_size,test_size=0.1,seed=3435):
         yield (train_batch,test_batch,i+1)
     
 
-def load_data(attr,mini_batch_size=50,cv=0,test=False):
+def load_data(attr,mini_batch_size=50,test=False):
     print ("loading data...")
     with open("processed.pkl","rb") as f:
         x = pickle.load(f)
@@ -133,46 +124,44 @@ def load_data(attr,mini_batch_size=50,cv=0,test=False):
     charged_words=set(charged_words)
 
     results = []
-    #cv fold
-    if cv <11:
-        #datasets:[fortrainX, trainY, testX, testY, mTrain, mTest]
-        datasets = make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, cv, attr, max_l=149, max_s=312, filter_h=3)
-        #shuffle dataset and assign to mini batches. if dataset size is not a multiple of mini batches, replicate
-        #extra data (at random)
-        if test==True:
-            test_set_x = datasets[2].reshape((datasets[2].shape[0],-1))
-            test_set_y = np.asarray(datasets[3],int).reshape((datasets[3].shape[0],-1))
-            test_set_m = datasets[5].reshape((datasets[5].shape[0],-1))
-            yield test_set_x,test_set_y,test_set_m
-        else:
-            mini_batches_generator=mini_batches(len(datasets[0]),batch_size=mini_batch_size)
-            for t,v,_ in mini_batches_generator:
-                    #divide train set into train/val sets
-                    ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
-                    #reshape (Minibatch,None)
-                    train_set_x=datasets[0][t]
-                    
-                    '''
-                    train_set_x shape :(45, 312, 153)
-                    '''
-                    val_set_x=datasets[0][v]
-                    train_set_y=datasets[1][t]
-                    val_set_y=datasets[1][v]
-                    #list of 84 feature per doc
-                    train_set_m=datasets[4][t]
-                    val_set_m=datasets[4][v]
-                    #print('Mini-batch load : before transform idx to embed')
-                    #print(train_set_x.shape)
-                    train_set_x=data_idx2vec(train_set_x)
-                    val_set_x=data_idx2vec(val_set_x)
-                    """
-                    print(train_set_x.shape)
-                    print(train_set_m.shape)
-                    (45, 312, 153, 300)
-                    (45, 84)
-                    """
-                    yield train_set_x,train_set_y,val_set_x,val_set_y,train_set_m,val_set_m
+    #datasets:[fortrainX, trainY, testX, testY, mTrain, mTest]
+    datasets = make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, attr, max_l=149, max_s=312, filter_h=3)
+    #shuffle dataset and assign to mini batches. if dataset size is not a multiple of mini batches, replicate
+    #extra data (at random)
+    if test==True:
+        test_set_x = datasets[2]
+        test_set_y = np.asarray(datasets[3],int)
+        test_set_m = datasets[5]
+        yield test_set_x,test_set_y,test_set_m
+    else:
+        mini_batches_generator=mini_batches(len(datasets[0]),batch_size=mini_batch_size)
+        for t,v,_ in mini_batches_generator:
+                #divide train set into train/val sets
+                ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
+                #reshape (Minibatch,None)
+                train_set_x=datasets[0][t]
+                
+                '''
+                train_set_x shape :(45, 312, 153)
+                '''
+                val_set_x=datasets[0][v]
+                train_set_y=datasets[1][t]
+                val_set_y=datasets[1][v]
+                #list of 84 feature per doc
+                train_set_m=datasets[4][t]
+                val_set_m=datasets[4][v]
+                #print('Mini-batch load : before transform idx to embed')
+                #print(train_set_x.shape)
+                train_set_x=data_idx2vec(train_set_x)
+                val_set_x=data_idx2vec(val_set_x)
+                """
+                print(train_set_x.shape)
+                print(train_set_m.shape)
+                (45, 312, 153, 300)
+                (45, 84)
+                """
+                yield train_set_x,train_set_y,val_set_x,val_set_y,train_set_m,val_set_m
 
-                    # (45, 312, 153, 300)
-                    #(batch,sentences_in_text,words_indexesin sentence)
+                # (45, 312, 153, 300)
+                #(batch,sentences_in_text,words_indexesin sentence)
 #next(load_data(2))
