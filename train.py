@@ -64,6 +64,7 @@ def train(attr=2):
     epochs=1,
     validation_data=test_generator,
     steps_per_epoch=steps
+    ,validation_steps=steps
     )
 
 
