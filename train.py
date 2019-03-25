@@ -19,7 +19,7 @@ def nll2(y_true, y_pred):
 
     return - K.sum(likelihood.log_prob(y_true), axis=-1)
 
-def train(attr=2,train_size=0.9):
+def init(attr=2,train_size=0.9):
     #data generator
     #load first mini-batch
     """
@@ -46,16 +46,20 @@ def train(attr=2,train_size=0.9):
     filter_hs=[1,2,3]
     filter_shapes = []
     pool_sizes = []
+    reshape=(_S,_W)
     for filter_h in filter_hs:
         filter_shapes.append((filter_h, _E))
         pool_sizes.append((_S*(_W-filter_h+1),1))
-    model=BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size)
+    model=BigFiveCnnModel(W,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size)
     model.summary()
     model.compile(loss=nll1,optimizer="adadelta")
     return model,train_generator,test_generator
 
     
-    
+def train(attr=2):
+    model,train_generator,test_generator=init(attr)
+
+
     
         
     

@@ -44,11 +44,11 @@ def DocumentLevel(sentlevel,hidden_units,docs_size=312):
     output=Dense(hidden_units[1],activation="softmax")(output)
     return Model(inputs=[sentlevel.input,m_features],outputs=output)
 
-def BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=(312*153,300,1),filter_hs=[1,2,3],hidden_units=[200,200,2],conv_non_linear='relu',docs_size=312):
+def BigFiveCnnModel(embedding_matrix,filter_shapes,pool_sizes,reshape,filter_hs=[1,2,3],hidden_units=[200,200,2],conv_non_linear='relu',docs_size=312):
     """
     input : W X E (batch = D X S)
     input_shape=(S*W,E,1)
     """
-    SentModel=SentenceLevel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs,hidden_units=hidden_units[0])
+    SentModel=SentenceLevel(embedding_matrix,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units[0])
     model=DocumentLevel(SentModel,hidden_units=hidden_units[1:],docs_size=docs_size)
     return model
