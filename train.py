@@ -28,7 +28,7 @@ def nll2(y_true, y_pred):
 
     return - K.sum(likelihood.log_prob(y_true), axis=-1)
 
-def init(attr=2,train_size=0.9,batcTensorBoardh_size=25):
+def init(attr=2,train_size=0.9,batch_size=25):
     #data generator
     #load first mini-batch
     """
