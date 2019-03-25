@@ -59,15 +59,19 @@ def init(attr=2,train_size=0.9,batch_size=25):
 
     
 def train(batch_size,attr=2):
-    model,train_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size)
-    print('=================== Training ===================')
-    model.fit_generator(
-    generator=train_generator,
-    epochs=1,
-    validation_data=test_generator,
-    steps_per_epoch=steps//10
-    ,validation_steps=vsteps//10
-    )
+    with tf.device('/cpu:0'):
+        model,train_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size)
+       
+        parallel_model = multi_gpu_model(model, gpus=1)
+        print('=================== Training ===================')
+        parallel_model.fit_generator(
+        generator=train_generator,
+        epochs=1,
+        validation_data=test_generator,
+        steps_per_epoch=steps//10
+        ,validation_steps=vsteps//10
+        )
+
 
 
     
