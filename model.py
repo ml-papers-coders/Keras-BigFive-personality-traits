@@ -1,21 +1,25 @@
 from tensorflow.keras.models import Sequential,Model
-from tensorflow.keras.layers import Dense, Activation ,Conv2D,MaxPooling2D , Input,Concatenate, Reshape,Flatten,Dense
+from tensorflow.keras.layers import Dense, Activation ,Conv2D,MaxPooling2D , Input,Concatenate, Reshape,Flatten,Dense,Embedding
 
 
-def SentenceLevel(filter_shapes,pool_sizes,input_shape=(312*153,300,1),filter_hs=[1,2,3],hidden_units=200,conv_non_linear='relu'):
+def SentenceLevel(embedding_matrix,filter_shapes,pool_sizes,reshape,filter_hs=[1,2,3],hidden_units=200,conv_non_linear='relu'):
     """
     Apply a convolutional filter on EACH SENTENCE : => filter (n,E) on (W,E)
     (nb_words,E,1=channel)
     """
+    S,W=reshape
     #nb_words,emb_dim=input_shape
+    vocab_size,embed_dim=embedding_matrix.shape
     feature_maps = hidden_units #nb FM
-    model_input_layer= Input(shape=(input_shape))
+    model_input_layer= Input(shape=(embed_dim,))
+    embedding_layer=Embedding(vocab_size,embed_dim,weights=[embedding_matrix])(model_input_layer)
+    reshape_layer=Reshape((S*W,embed_dim,1))(embedding_layer)
     layers=[]
     for i in range(len(filter_hs)):
         #print('layer'+str(i))
         filter_shape = filter_shapes[i] # ({1,2,3},300) (h,w)
         pool_size = pool_sizes[i] # S*(img_h-filter_h+1),img_w-filter_w+1
-        layer=Conv2D(filters=feature_maps,kernel_size=filter_shape,activation=conv_non_linear)(model_input_layer)
+        layer=Conv2D(filters=feature_maps,kernel_size=filter_shape,activation=conv_non_linear)(reshape_layer)
         print("Conv:LAYER "+str(i)+': input='+str(layer.shape)+' // output= '+str(layer.shape))
         layer=MaxPooling2D(pool_size=pool_size)(layer)
         layers.append(layer)

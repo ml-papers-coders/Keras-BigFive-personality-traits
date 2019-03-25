@@ -1,7 +1,9 @@
 from model import BigFiveCnnModel
-from data import data_generator
 from tensorflow.keras import backend as K
 import tensorflow as tf
+from data import data_idx,load_data,w2idx,data_gen
+import numpy as np
+
 
 def nll1(y_true, y_pred):
     """ Negative log likelihood. """
@@ -17,33 +19,40 @@ def nll2(y_true, y_pred):
 
     return - K.sum(likelihood.log_prob(y_true), axis=-1)
 
-def train(attr=2):
+def train(attr=2,train_size=0.9):
     #data generator
     #load first mini-batch
     """
     train_set_x (45, 312, 153, 300)
     """
-    #Model config 
-    D=45#train_set_x.shape[0]
-    S=312#train_set_x.shape[1]
-    W=153#train_set_x.shape[2]
-    E=300#train_set_x.shape[3]
-    input_shape=(S*W,E,1)
-    docs_size=S
+    batch_size=25
+    revs, W, W2, word_idx_map, vocab, mairesse ,charged_words=load_data(attr)
+    datasets = w2idx(revs, word_idx_map, mairesse, charged_words, attr, max_l=149, max_s=312, filter_h=3)
+    _D=len(datasets[0])
+    _S=len(datasets[0][0])
+    _W=len(datasets[0][0][0])
+    _E=W.shape[0]
+    dataset_idx=data_idx(attr,len(datasets[0]),batch_size)
+
+    #split train val
+    n_train_items=int(np.round(train_size*_D))
+    train_idx=dataset_idx[:n_train_items]
+    test_idx=dataset_idx[n_train_items:]
+    train_generator=data_gen(attr,train_idx,datasets,W,batch_size=25)
+    test_generator=data_gen(attr,test_idx,datasets,W,batch_size=25)
+    input_shape=(_S*_W,_E,1)
+    docs_size=_S
     hidden_units=[200,200,2]
     filter_hs=[1,2,3]
     filter_shapes = []
     pool_sizes = []
     for filter_h in filter_hs:
-        filter_shapes.append((filter_h, E))
-        pool_sizes.append((S*(W-filter_h+1),1))
+        filter_shapes.append((filter_h, _E))
+        pool_sizes.append((_S*(_W-filter_h+1),1))
     model=BigFiveCnnModel(filter_shapes,pool_sizes,input_shape=input_shape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size)
     model.summary()
     model.compile(loss=nll1,optimizer="adadelta")
-    train_data_generator=data_generator(attr,reshape=(S,W,E))
-    val_data_generator=data_generator(attr,val=False,reshape=(S,W,E))
-    model.fit_generator(generator=train_data_generator,epochs=5,validation_data=val_data_generator,steps_per_epoch=1,validation_steps=1)
-    return model
+    return model,train_generator,test_generator
 
     
     

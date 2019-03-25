@@ -41,11 +41,11 @@ def get_idx_from_sent(status, word_idx_map, charged_words, max_l=51, max_s=200, 
         x.extend([[0]*(max_l+2*pad)]*(max_s-len(x)))
     return x
 
-def make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, per_attr=0, max_l=51, max_s=200, filter_h=5):
+def w2idx(revs, word_idx_map, mairesse, charged_words, per_attr=0, max_l=51, max_s=200, filter_h=5):
     """
     Transforms sentences into a 2-d matrix. of word indx
     """
-    trainX, testX, trainY, testY, mTrain, mTest = [], [], [], [], [], []
+    trainX, trainY, mTrain = [], [], []
     for rev in revs:
         sent = get_idx_from_sent(rev["text"], word_idx_map,
         charged_words,
@@ -55,48 +55,13 @@ def make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, per_attr=0, ma
         trainY.append(rev['y'+str(per_attr)])
         mTrain.append(mairesse[rev["user"]])
     trainX = np.array(trainX,dtype=int)
-    testX = np.array(testX,dtype=int)
-    trainY = np.array(trainY,dtype=int)
-    testY = np.array(testY,dtype=int)
     #mTrain is the mairesse features
     mTrain = np.array(mTrain, dtype=float)
-    mTest = np.array(mTest, dtype=float)
-    return [trainX, trainY, testX, testY, mTrain, mTest]
+    return [trainX, trainY , mTrain]
 
-def mini_batches(data_size,batch_size,test_size=0.1,seed=3435):
-    """
-    return indices
-    shuffle dataset and assign to mini batches. if dataset size is not a multiple of mini batches, replicate
-    extra data (at random)
-    """
-    train_size=1-test_size
-    np.random.seed(seed)
-    if data_size % batch_size > 0 :
-        extra_data_num = batch_size - data_size % batch_size
-        
-        rand_perm = np.random.permutation(range(data_size))
-        extra_data=rand_perm[:extra_data_num]
-        
-        # add random replication
-        new_data=np.append(np.arange(data_size),extra_data)
-    else:
-        new_data=np.random.permutation(range(data_size))
 
-    # Shuffling the new data
-    n_batches = int(new_data.shape[0]/batch_size)
-    rand_perm = np.random.permutation(range(len(new_data)))
-    new_data=new_data[rand_perm]
 
-    #divide train set into train/val sets
-    n_train_items=int(np.round(train_size*batch_size))
-    for i in range(n_batches):
-        batch=new_data[i*batch_size:(i+1)*batch_size]
-        train_batch= batch[:n_train_items]
-        test_batch=batch[n_train_items:]
-        yield (train_batch,test_batch,i+1)
-    
-
-def load_data(attr,mini_batch_size=50):
+def load_data(attr):
     print ("loading data...")
     with open("processed.pkl","rb") as f:
         x = pickle.load(f)
@@ -123,61 +88,47 @@ def load_data(attr,mini_batch_size=50):
 
 def data_idx2vec(data,W):
     print(data.flatten().shape)
-    return np.asarray(W[np.array(data.flatten(),dtype="int32")]).reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
+    return np.asarray(WW[np.array(data.flatten(),dtype="int32")]).reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
 
-def test_data_generator(attr):
-    revs, W, W2, word_idx_map, vocab, mairesse ,charged_words=load_data(attr,mini_batch_size=50)
-    datasets = make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, attr, max_l=149, max_s=312, filter_h=3)
-    test_set_x = datasets[2]
-    test_set_y = np.asarray(datasets[3],int)
-    test_set_m = datasets[5]
-    yield test_set_x,test_set_y,test_set_m
 
-def data_generator(attr,reshape,val=False):
-    _S,_W,_E=reshape
-    mini_batch_size=50
-    revs, W, W2, word_idx_map, vocab, mairesse ,charged_words=load_data(attr,mini_batch_size=50)
-    #datasets:[fortrainX, trainY, testX, testY, mTrain, mTest]
-    datasets = make_idx_data_cv(revs, word_idx_map, mairesse, charged_words, attr, max_l=149, max_s=312, filter_h=3)
-    #shuffle dataset and assign to mini batches. if dataset size is not a multiple of mini batches, replicate
-    #extra data (at random)
-    mini_batches_generator=mini_batches(len(datasets[0]),batch_size=mini_batch_size)
-    for t,v,_ in mini_batches_generator:
-            #divide train set into train/val sets
-            ##dataset shape :[trainX, trainY, testX, testY, mTrain, mTest]
-            #reshape (Minibatch,None)
-            if val ==False:
-                train_set_x=datasets[0][t]
-                
-                '''
-                train_set_x shape :(45, 312, 153)
-                '''
-                train_set_y=datasets[1][t].reshape((-1,1)) # -1 W,E,1
-                #list of 84 feature per doc
-                train_set_m=datasets[4][t].reshape((-1,84))
-                #print('Mini-batch load : before transform idx to embed')
-                #print(train_set_x.shape)
-                #print(train_set_x.dtype) int64
-                train_set_x=data_idx2vec(train_set_x,W)
-                print(train_set_x.shape)
-                print(train_set_x.dtype)
-                train_set_x=train_set_x.reshape((-1,_S*_W,_E,1))
-                
-                """
-                print(train_set_x.shape)
-                print(train_set_m.shape)
-                (45, 312, 153, 300)
-                (45, 84)
-                """
-                yield [train_set_x,train_set_m],train_set_y
-            if val==True:
-                val_set_x=datasets[0][v]
-                val_set_y=datasets[1][v].reshape((-1,1))
-                val_set_x=data_idx2vec(val_set_x,W).reshape((-1,_S*_W,_E,1))
-                val_set_m=datasets[4][v].reshape((-1,84))
+def data_idx(attr,data_size,batch_size,seed=0):
+    np.random.seed(seed)
+    if data_size % batch_size > 0 :
+        extra_data_num = batch_size - data_size % batch_size
+        
+        rand_perm = np.random.permutation(range(data_size))
+        extra_data=rand_perm[:extra_data_num]
+        
+        # add random replication
+        new_data=np.append(np.arange(data_size),extra_data)
+    else:
+        new_data=np.random.permutation(range(data_size))
+    return new_data    
 
-                yield [val_set_x,val_set_m],val_set_y
-
-                # (45, 312, 153, 300)
-                #(batch,sentences_in_text,words_indexesin sentence)
+def data_gen(attr,data_idx,datasets,W,batch_size,seed=0):
+    n_batches = int(data_idx.shape[0]/batch_size)
+    for i in range(n_batches):
+        # Shuffling the new data
+        rand_perm = np.random.permutation(range(len(data_idx)))
+        data_idx=data_idx[rand_perm]
+        batch_idx=data_idx[:batch_size]
+        
+        train_set_x=datasets[0][batch_idx]
+        train_set_y=datasets[1][batch_idx].reshape((-1,1)) # -1 W,E,1
+        #list of 84 feature per doc
+        train_set_m=datasets[2][batch_idx].reshape((-1,84))
+        #print('Mini-batch load : before transform idx to embed')
+        #print(train_set_x.shape)
+        #print(train_set_x.dtype) int64
+        train_set_x=data_idx2vec(train_set_x,W)
+        _E=W.shape[1]
+        train_set_x=train_set_x.reshape((_E,))
+    
+        """
+        print(train_set_x.shape)
+        print(train_set_m.shape)
+        (45, 312, 153, 300)
+        (45, 84)
+        """
+        yield [train_set_x,train_set_m],train_set_y
 

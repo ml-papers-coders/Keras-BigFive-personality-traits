@@ -7,7 +7,7 @@ import csv
 import gensim
 
 
-def build_data_cv(datafile, clean_string=True):
+def build_data(datafile, clean_string=True):
     """
     Loads data and split into 10 folds.
     """
@@ -154,7 +154,7 @@ if __name__=="__main__":
     data_folder = sys.argv[2]
     mairesse_file = sys.argv[3]
     print ("loading data...")
-    revs, vocab = build_data_cv(data_folder, clean_string=True)
+    revs, vocab = build_data(data_folder, clean_string=True)
     num_words=pd.DataFrame(revs)["num_words"]
     max_l = np.max(num_words)
     print( "data loaded!")
@@ -173,4 +173,3 @@ if __name__=="__main__":
     mairesse = get_mairesse_features(mairesse_file)
     cPickle.dump([revs, W, W2, word_idx_map, vocab, mairesse], open("processed.pkl", "wb"))
     print( "dataset created!")
-    
