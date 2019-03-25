@@ -72,5 +72,5 @@ def train(batch_size,attr=2):
     
         
     
-train(batch_size=1)
+train(batch_size=25)
 
