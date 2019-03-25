@@ -7,8 +7,7 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras.callbacks import TensorBoard
 
 LOG_DIR = './log'
-tb_cmd='tensorboard --logdir {} --host 0.0.0.0 --port 6006 &'
-    .format(LOG_DIR)
+tb_cmd='tensorboard --logdir {} --host 0.0.0.0 --port 6006 &'.format(LOG_DIR)
 !$tb_cmd
 !./ngrok http 6006 &
 ! curl -s http://localhost:4040/api/tunnels | python3 -c \
