@@ -31,7 +31,7 @@ def init(attr=2,train_size=0.9):
     _D=len(datasets[0])
     _S=len(datasets[0][0])
     _W=len(datasets[0][0][0])
-    _E=W.shape[0]
+    _E=W.shape[1]
     dataset_idx=data_idx(attr,len(datasets[0]),batch_size)
 
     #split train val
