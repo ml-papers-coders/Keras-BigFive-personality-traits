@@ -19,13 +19,13 @@ def nll2(y_true, y_pred):
 
     return - K.sum(likelihood.log_prob(y_true), axis=-1)
 
-def init(attr=2,train_size=0.9):
+def init(attr=2,train_size=0.9,batch_size=25):
     #data generator
     #load first mini-batch
     """
     train_set_x (45, 312, 153, 300)
     """
-    batch_size=25
+    
     revs, W, W2, word_idx_map, vocab, mairesse ,charged_words=load_data(attr)
     datasets = w2idx(revs, word_idx_map, mairesse, charged_words, attr, max_l=149, max_s=312, filter_h=3)
     _D=len(datasets[0])
@@ -53,11 +53,18 @@ def init(attr=2,train_size=0.9):
     model=BigFiveCnnModel(W,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size)
     model.summary()
     model.compile(loss=nll1,optimizer="adadelta")
-    return model,train_generator,test_generator
+    steps=train_idx.shape[0]//batch_size
+    return model,train_generator,test_generator,steps
 
     
 def train(attr=2):
-    model,train_generator,test_generator=init(attr)
+    model,train_generator,test_generator,steps=init(attr)
+    model.fit_generator(
+    generator=train_generator,
+    epochs=1,
+    validation_data=test_generator,
+    steps_per_epoch=steps
+    )
 
 
     
