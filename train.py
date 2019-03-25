@@ -28,7 +28,7 @@ def nll2(y_true, y_pred):
 
     return - K.sum(likelihood.log_prob(y_true), axis=-1)
 
-def init(attr=2,train_size=0.9,batch_size=25):
+def init(attr=2,train_size=0.9,batch_size=25,trainable_embed=False):
     #data generator
     #load first mini-batch
     """
@@ -59,7 +59,7 @@ def init(attr=2,train_size=0.9,batch_size=25):
     for filter_h in filter_hs:
         filter_shapes.append((filter_h, _E))
         pool_sizes.append((_S*(_W-filter_h+1),1))
-    model=BigFiveCnnModel(W,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size)
+    model=BigFiveCnnModel(W,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size,trainable_embed=trainable_embed)
     model.summary()
     model.compile(loss=nll1,optimizer="adadelta")
     steps=train_idx.shape[0]//batch_size
@@ -67,10 +67,10 @@ def init(attr=2,train_size=0.9,batch_size=25):
     return model,train_generator,test_generator,steps,v_steps
 
     
-def train(batch_size,attr=2):
+def train(batch_size,attr=2,trainable_embed=False):
 
     with tf.device('/cpu:0'):
-        model,train_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size)
+        model,train_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=False)
         #take a selfie of the model :D
         #plot_model(model, to_file='selfie.png')
     with tf.device('/gpu:0'):
@@ -93,5 +93,5 @@ def train(batch_size,attr=2):
     
         
     
-train(batch_size=5)
+train(batch_size=5,trainable_embed=False)
 

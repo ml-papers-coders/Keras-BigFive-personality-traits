@@ -2,7 +2,7 @@ from tensorflow.keras.models import Sequential,Model
 from tensorflow.keras.layers import Dense, Activation ,Conv2D,MaxPooling2D , Input,Concatenate, Reshape,Flatten,Dense,Embedding
 
 
-def SentenceLevel(embedding_matrix,filter_shapes,pool_sizes,reshape,filter_hs=[1,2,3],hidden_units=200,conv_non_linear='relu'):
+def SentenceLevel(embedding_matrix,filter_shapes,pool_sizes,reshape,filter_hs=[1,2,3],hidden_units=200,trainable_embed=False,conv_non_linear='relu'):
     """
     Apply a convolutional filter on EACH SENTENCE : => filter (n,E) on (W,E)
     (nb_words,E,1=channel)
@@ -13,7 +13,7 @@ def SentenceLevel(embedding_matrix,filter_shapes,pool_sizes,reshape,filter_hs=[1
     feature_maps = hidden_units #nb FM
     model_input_layer= Input(shape=(S,W))
     reshpe_input=Reshape((S*W,))(model_input_layer)
-    embedding_layer=Embedding(vocab_size,embed_dim,weights=[embedding_matrix])(reshpe_input)
+    embedding_layer=Embedding(vocab_size,embed_dim,trainable=trainable_embed,weights=[embedding_matrix])(reshpe_input)
     reshape_layer=Reshape((S*W,embed_dim,1))(embedding_layer)
     layers=[]
     for i in range(len(filter_hs)):
@@ -45,11 +45,16 @@ def DocumentLevel(sentlevel,hidden_units,docs_size=312):
     output=Dense(hidden_units[1],activation="softmax")(output)
     return Model(inputs=[sentlevel.input,m_features],outputs=output)
 
-def BigFiveCnnModel(embedding_matrix,filter_shapes,pool_sizes,reshape,filter_hs=[1,2,3],hidden_units=[200,200,2],conv_non_linear='relu',docs_size=312):
+def BigFiveCnnModel(embedding_matrix
+                    ,filter_shapes
+                    ,pool_sizes
+                    ,reshape,filter_hs=[1,2,3]
+                    ,hidden_units=[200,200,2],conv_non_linear='relu',docs_size=312
+                    ,trainable_embed=False):
     """
     input : W X E (batch = D X S)
     input_shape=(S*W,E,1)
     """
-    SentModel=SentenceLevel(embedding_matrix,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units[0])
+    SentModel=SentenceLevel(embedding_matrix,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units[0],trainable_embed=trainable_embed)
     model=DocumentLevel(SentModel,hidden_units=hidden_units[1:],docs_size=docs_size)
     return model
