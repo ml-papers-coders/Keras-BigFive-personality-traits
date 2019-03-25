@@ -7,13 +7,13 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras.callbacks import TensorBoard
 import os
 
-LOG_DIR = './log'
+"""LOG_DIR = './log'
 tb_cmd='tensorboard --logdir {} --host 0.0.0.0 --port 6006 &'.format(LOG_DIR)
 os.system(tb_cmd)
 os.system('./ngrok http 6006 &')
 os.system("curl -s http://localhost:4040/api/tunnels | python3 -c \
     \"import sys, json; print(json.load(sys.stdin)['tunnels'][0]['public_url'])\""
-)
+)"""
 def nll1(y_true, y_pred):
     """ Negative log likelihood. """
 
@@ -81,10 +81,10 @@ def train(batch_size,attr=2):
         validation_data=test_generator,
         steps_per_epoch=steps//10
         ,validation_steps=vsteps//10
-        ,callbacks=[TensorBoard(
-            log_dir=LOG_DIR, histogram_freq=0
-            , write_graph=True
-            , write_images=True)]
+        #,callbacks=[TensorBoard(
+        #    log_dir=LOG_DIR, histogram_freq=0
+        #    , write_graph=True
+        #    , write_images=True)]
         )
         model.save("model.h5")
 
