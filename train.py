@@ -3,7 +3,7 @@ from tensorflow.keras import backend as K
 import tensorflow as tf
 from data import data_idx,load_data,w2idx,data_gen
 import numpy as np
-from tensorflow.keras.utils import multi_gpu_model
+from tensorflow.keras.utils import multi_gpu_model,plot_model
 
 
 def nll1(y_true, y_pred):
@@ -62,7 +62,8 @@ def init(attr=2,train_size=0.9,batch_size=25):
 def train(batch_size,attr=2):
     with tf.device('/cpu:0'):
         model,train_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size)
-       
+        #take a selfie of the model :D
+        plot_model(model), to_file='selfie.png')
     with tf.device('/gpu:0'):
         print('=================== Training ===================')
         model.fit_generator(
