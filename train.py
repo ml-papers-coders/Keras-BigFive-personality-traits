@@ -3,6 +3,7 @@ from tensorflow.keras import backend as K
 import tensorflow as tf
 from data import data_idx,load_data,w2idx,data_gen
 import numpy as np
+from tensorflow.keras.utils import multi_gpu_model
 
 
 def nll1(y_true, y_pred):
