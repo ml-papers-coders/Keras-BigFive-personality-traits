@@ -61,6 +61,8 @@ def init(attr=2,train_size=0.9,batch_size=25):
     
 def train(batch_size,attr=2):
     with tf.device('/cpu:0'):
+        from tensorboardcolab import TensorBoardColab, TensorBoardColabCallback
+        tbc=TensorBoardColab()
         model,train_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size)
         #take a selfie of the model :D
         plot_model(model, to_file='selfie.png')
@@ -72,6 +74,7 @@ def train(batch_size,attr=2):
         validation_data=test_generator,
         steps_per_epoch=steps//10
         ,validation_steps=vsteps//10
+        ,callbacks=[TensorBoardColabCallback(tbc)]
         )
 
 
