@@ -54,23 +54,24 @@ def init(attr=2,train_size=0.9,batch_size=25):
     model.summary()
     model.compile(loss=nll1,optimizer="adadelta")
     steps=train_idx.shape[0]//batch_size
-    return model,train_generator,test_generator,steps
+    v_steps=test_idx.shape[0]//batch_size
+    return model,train_generator,test_generator,steps,v_steps
 
     
 def train(batch_size,attr=2):
-    model,train_generator,test_generator,steps=init(attr,batch_size=batch_size)
+    model,train_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size)
     print('=================== Training ===================')
     model.fit_generator(
     generator=train_generator,
     epochs=1,
     validation_data=test_generator,
     steps_per_epoch=steps
-    ,validation_steps=steps
+    ,validation_steps=vsteps
     )
 
 
     
         
     
-train(batch_size=25)
+train(batch_size=5)
 
