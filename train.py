@@ -70,14 +70,14 @@ def init(attr=2,train_size=0.9,batch_size=25,trainable_embed=False):
 def train(batch_size,attr=2,trainable_embed=False):
 
     with tf.device('/cpu:0'):
-        model,train_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=False)
+        model,train_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=trainable_embed)
         #take a selfie of the model :D
         #plot_model(model, to_file='selfie.png')
     with tf.device('/gpu:0'):
         print('=================== Training ===================')
         model.fit_generator(
         generator=train_generator,
-        epochs=1,
+        epochs=10,
         validation_data=test_generator,
         steps_per_epoch=steps//10
         ,validation_steps=vsteps//10
