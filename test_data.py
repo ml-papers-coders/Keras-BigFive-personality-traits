@@ -11,8 +11,12 @@ datasets = w2idx(revs, word_idx_map, mairesse, charged_words, attr, max_l=149, m
 _D=len(datasets[0])
 _S=len(datasets[0][0])
 _W=len(datasets[0][0][0])
-_E=W.shape[0]
+_E=W.shape[1]
+print(_D)
+print(_S)
+print(_W)
 print(_E)
+
 dataset_idx=data_idx(attr,len(datasets[0]),batch_size)
 
 #split train val
