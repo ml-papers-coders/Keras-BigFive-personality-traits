@@ -65,8 +65,8 @@ def train(batch_size,attr=2):
     generator=train_generator,
     epochs=1,
     validation_data=test_generator,
-    steps_per_epoch=steps
-    ,validation_steps=vsteps
+    steps_per_epoch=steps//10
+    ,validation_steps=vsteps//10
     )
 
 
