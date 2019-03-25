@@ -57,8 +57,8 @@ def init(attr=2,train_size=0.9,batch_size=25):
     return model,train_generator,test_generator,steps
 
     
-def train(attr=2):
-    model,train_generator,test_generator,steps=init(attr)
+def train(batch_size,attr=2):
+    model,train_generator,test_generator,steps=init(attr,batch_size=batch_size)
     model.fit_generator(
     generator=train_generator,
     epochs=1,
@@ -71,5 +71,5 @@ def train(attr=2):
     
         
     
-train()
+train(batch_size=5)
 

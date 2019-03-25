@@ -132,5 +132,6 @@ def data_gen(attr,data_idx,datasets,W,batch_size,reshape,seed=0):
         (45, 312, 153, 300)
         (45, 84)
         """
+        print("batch:"+str(i))
         yield [train_set_x,train_set_m],train_set_y
 
