@@ -64,6 +64,7 @@ def train(batch_size,attr=2):
         model,train_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size)
        
         parallel_model = multi_gpu_model(model, gpus=1)
+    with tf.device('/gpu:0'):
         print('=================== Training ===================')
         parallel_model.fit_generator(
         generator=train_generator,
