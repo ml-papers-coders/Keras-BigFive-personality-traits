@@ -41,7 +41,7 @@ def DocumentLevel(sentlevel,hidden_units,docs_size=312):
     # list of 84 M features per doc
     m_features=Input(shape=(84,))
     output=Concatenate()([output,m_features])
-    output=Dense(hidden_units[0],activation='softmax')(output)
+    output=Dense(hidden_units[0],activation='sigmoid')(output)
     output=Dense(hidden_units[1],activation="softmax")(output)
     return Model(inputs=[sentlevel.input,m_features],outputs=output)
 
