@@ -5,14 +5,15 @@ from data import data_idx,load_data,w2idx,data_gen
 import numpy as np
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras.callbacks import TensorBoard
+import os
 
 LOG_DIR = './log'
 tb_cmd='tensorboard --logdir {} --host 0.0.0.0 --port 6006 &'.format(LOG_DIR)
-!$tb_cmd
-!./ngrok http 6006 &
-! curl -s http://localhost:4040/api/tunnels | python3 -c \
-    "import sys, json; print(json.load(sys.stdin)['tunnels'][0]['public_url'])"
-
+os.system(tb_cmd)
+os.system('./ngrok http 6006 &')
+os.system("curl -s http://localhost:4040/api/tunnels | python3 -c \
+    \"import sys, json; print(json.load(sys.stdin)['tunnels'][0]['public_url'])\""
+)
 def nll1(y_true, y_pred):
     """ Negative log likelihood. """
 
