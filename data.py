@@ -124,7 +124,7 @@ def data_gen(attr,data_idx,datasets,W,batch_size,reshape,seed=0):
         #print(train_set_x.dtype) int64
         train_set_x=data_idx2vec(train_set_x,W)
         _E=W.shape[1]
-        train_set_x=train_set_x.reshape((_S,_W,_E))
+        train_set_x=train_set_x.reshape((-1,_S,_W,_E))
     
         """
         print(train_set_x.shape)
