@@ -11,7 +11,7 @@ def SentenceLevel(embedding_matrix,filter_shapes,pool_sizes,reshape,filter_hs=[1
     #nb_words,emb_dim=input_shape
     vocab_size,embed_dim=embedding_matrix.shape
     feature_maps = hidden_units #nb FM
-    model_input_layer= Input(shape=(embed_dim,))
+    model_input_layer= Input(shape=(S,W,embed_dim))
     embedding_layer=Embedding(vocab_size,embed_dim,weights=[embedding_matrix])(model_input_layer)
     reshape_layer=Reshape((S*W,embed_dim,1))(embedding_layer)
     layers=[]

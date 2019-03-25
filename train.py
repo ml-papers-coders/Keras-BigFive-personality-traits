@@ -38,8 +38,8 @@ def init(attr=2,train_size=0.9,batch_size=25):
     n_train_items=int(np.round(train_size*_D))
     train_idx=dataset_idx[:n_train_items]
     test_idx=dataset_idx[n_train_items:]
-    train_generator=data_gen(attr,train_idx,datasets,W,batch_size=25)
-    test_generator=data_gen(attr,test_idx,datasets,W,batch_size=25)
+    train_generator=data_gen(attr,train_idx,datasets,W,reshape=(_S,_W),batch_size=25)
+    test_generator=data_gen(attr,test_idx,datasets,W,reshape=(_S,_W),batch_size=25)
     input_shape=(_S*_W,_E,1)
     docs_size=_S
     hidden_units=[200,200,2]
