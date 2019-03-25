@@ -57,6 +57,7 @@ def w2idx(revs, word_idx_map, mairesse, charged_words, per_attr=0, max_l=51, max
     trainX = np.array(trainX,dtype=int)
     #mTrain is the mairesse features
     mTrain = np.array(mTrain, dtype=float)
+    trainY=np.array(trainY,dtype=int)
     return [trainX, trainY , mTrain]
 
 
@@ -88,7 +89,7 @@ def load_data(attr):
 
 def data_idx2vec(data,W):
     print(data.flatten().shape)
-    return np.asarray(WW[np.array(data.flatten(),dtype="int32")]).reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
+    return np.asarray(W[np.array(data.flatten(),dtype="int32")]).reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
 
 
 def data_idx(attr,data_size,batch_size,seed=0):

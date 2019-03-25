@@ -12,6 +12,7 @@ _D=len(datasets[0])
 _S=len(datasets[0][0])
 _W=len(datasets[0][0][0])
 _E=W.shape[0]
+print(_E)
 dataset_idx=data_idx(attr,len(datasets[0]),batch_size)
 
 #split train val
