@@ -92,7 +92,7 @@ def data_idx2vec(data,W):
     return np.asarray(W[np.array(data.flatten(),dtype="int32")]).reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
 
 
-def data_idx(attr,data_size,batch_size,seed=0):
+def data_idx(data_size,batch_size,seed=0):
     np.random.seed(seed)
     if data_size % batch_size > 0 :
         extra_data_num = batch_size - data_size % batch_size
@@ -107,9 +107,9 @@ def data_idx(attr,data_size,batch_size,seed=0):
     return new_data    
 
 def data_gen(attr,data_idx,datasets,W,batch_size,seed=0):
-    n_batches = int(data_idx.shape[0]//batch_size)
+    #n_batches = int(data_idx.shape[0]//batch_size)
     #_S,_W=reshape
-    for i in range(n_batches):
+    while True:
         # Shuffling the new data
         rand_perm = np.random.permutation(range(data_idx.shape[0]))
         data_idx=data_idx[rand_perm]

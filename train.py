@@ -29,7 +29,7 @@ def nll2(y_true, y_pred):
 
     return - K.sum(likelihood.log_prob(y_true), axis=-1)
 
-def init(attr=2,train_size=0.9,batch_size=25,trainable_embed=False):
+def init(attr=2,train_size=0.8,test_size=0.1,batch_size=25,trainable_embed=False):
     #data generator
     #load first mini-batch
     """
@@ -42,16 +42,20 @@ def init(attr=2,train_size=0.9,batch_size=25,trainable_embed=False):
     _S=len(datasets[0][0])
     _W=len(datasets[0][0][0])
     _E=W.shape[1]
-    dataset_idx=data_idx(attr,len(datasets[0]),batch_size)
-    print(len(datasets[0]))
-    exit()
+    dataset_idx=data_idx(len(datasets[0]),batch_size)
+    #print(len(datasets[0]))
+    # 2467
+    #exit()
 
     #split train val
     n_train_items=int(np.round(train_size*_D))
     train_idx=dataset_idx[:n_train_items]
-    test_idx=dataset_idx[n_train_items:]
-    #train_generator=data_gen(attr,train_idx,datasets,W,batch_size=25)
-    #test_generator=data_gen(attr,test_idx,datasets,W,batch_size=25)
+    n_test_items=int(test_size*_D)
+    test_idx=dataset_idx[n_train_items:n_train_items+n_test_items]
+    val_idx=dataset_idx[n_train_items+n_test_items:]
+    train_generator=data_gen(attr,train_idx,datasets,W,batch_size=25)
+    val_generator=data_gen(attr,val_idx,datasets,W,batch_size=25)
+    test_generator=data_gen(attr,test_idx,datasets,W,batch_size=25)
     
     input_shape=(_S*_W,_E,1)
     docs_size=_S
@@ -68,14 +72,14 @@ def init(attr=2,train_size=0.9,batch_size=25,trainable_embed=False):
     opt=Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
     model.compile(loss=nll2,optimizer=opt)
     steps=int(train_idx.shape[0]//batch_size)
-    v_steps=int(test_idx.shape[0]//batch_size)
-    return model,train_generator,test_generator,steps,v_steps
+    v_steps=int(val_idx.shape[0]//batch_size)
+    return model,train_generator,val_generator,test_generator,steps,v_steps
 
     
 def train(batch_size,attr=2,trainable_embed=False):
 
     with tf.device('/cpu:0'):
-        model,train_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=trainable_embed)
+        model,train_generator,val_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=trainable_embed)
         #take a pic of the model
         #plot_model(model, to_file='selfie.png')
     with tf.device('/gpu:0'):
@@ -88,7 +92,7 @@ def train(batch_size,attr=2,trainable_embed=False):
         model.fit_generator(
         generator=train_generator,
         epochs=10,
-        validation_data=test_generator,
+        validation_data=val_generator,
         steps_per_epoch=steps
         ,validation_steps=vsteps
         ,callbacks=callbacks_list
