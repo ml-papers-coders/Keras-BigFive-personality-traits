@@ -4,7 +4,7 @@ import tensorflow as tf
 from data import data_idx,load_data,w2idx,data_gen
 import numpy as np
 from tensorflow.keras.utils import plot_model
-from tensorflow.keras.callbacks import TensorBoard
+from tensorflow.keras.callbacks import TensorBoard,ModelCheckpoint
 from tensorflow.keras.optimizers import Adadelta
 import os
 
@@ -43,13 +43,16 @@ def init(attr=2,train_size=0.9,batch_size=25,trainable_embed=False):
     _W=len(datasets[0][0][0])
     _E=W.shape[1]
     dataset_idx=data_idx(attr,len(datasets[0]),batch_size)
+    print(len(datasets[0]))
+    exit()
 
     #split train val
     n_train_items=int(np.round(train_size*_D))
     train_idx=dataset_idx[:n_train_items]
     test_idx=dataset_idx[n_train_items:]
-    train_generator=data_gen(attr,train_idx,datasets,W,batch_size=25)
-    test_generator=data_gen(attr,test_idx,datasets,W,batch_size=25)
+    #train_generator=data_gen(attr,train_idx,datasets,W,batch_size=25)
+    #test_generator=data_gen(attr,test_idx,datasets,W,batch_size=25)
+    
     input_shape=(_S*_W,_E,1)
     docs_size=_S
     hidden_units=[200,200,2]
@@ -61,7 +64,7 @@ def init(attr=2,train_size=0.9,batch_size=25,trainable_embed=False):
         filter_shapes.append((filter_h, _E))
         pool_sizes.append((_S*(_W-filter_h+1),1))
     model=BigFiveCnnModel(W,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size,trainable_embed=trainable_embed)
-    model.summary()
+    #model.summary()
     opt=Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
     model.compile(loss=nll2,optimizer=opt)
     steps=int(train_idx.shape[0]//batch_size)
@@ -73,16 +76,22 @@ def train(batch_size,attr=2,trainable_embed=False):
 
     with tf.device('/cpu:0'):
         model,train_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=trainable_embed)
-        #take a selfie of the model :D
+        #take a pic of the model
         #plot_model(model, to_file='selfie.png')
     with tf.device('/gpu:0'):
         print('=================== Training ===================')
+        # checkpoint
+        filepath="weights.best.hdf5"
+        checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+        callbacks_list = [checkpoint]
+
         model.fit_generator(
         generator=train_generator,
         epochs=10,
         validation_data=test_generator,
         steps_per_epoch=steps
         ,validation_steps=vsteps
+        ,callbacks=callbacks_list
         #,callbacks=[TensorBoard(
         #    log_dir=LOG_DIR, histogram_freq=0
         #    , write_graph=True
