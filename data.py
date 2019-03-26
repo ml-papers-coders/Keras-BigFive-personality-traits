@@ -106,12 +106,12 @@ def data_idx(attr,data_size,batch_size,seed=0):
         new_data=np.random.permutation(range(data_size))
     return new_data    
 
-def data_gen(attr,data_idx,datasets,W,batch_size,reshape,seed=0):
-    n_batches = int(data_idx.shape[0]/batch_size)
-    _S,_W=reshape
+def data_gen(attr,data_idx,datasets,W,batch_size,seed=0):
+    n_batches = int(data_idx.shape[0]//batch_size)
+    #_S,_W=reshape
     for i in range(n_batches):
         # Shuffling the new data
-        rand_perm = np.random.permutation(range(len(data_idx)))
+        rand_perm = np.random.permutation(range(data_idx.shape[0]))
         data_idx=data_idx[rand_perm]
         batch_idx=data_idx[:batch_size]
         
@@ -123,7 +123,7 @@ def data_gen(attr,data_idx,datasets,W,batch_size,reshape,seed=0):
         #print(train_set_x.shape)
         #print(train_set_x.dtype) int64
         #train_set_x=data_idx2vec(train_set_x,W)
-        _E=W.shape[1]
+        #_E=W.shape[1]
         #train_set_x=train_set_x.reshape((-1,_S,_W))
         #print(train_set_x.shape)
         #print(train_set_y.shape)
@@ -134,6 +134,6 @@ def data_gen(attr,data_idx,datasets,W,batch_size,reshape,seed=0):
         (45, 312, 153, 300)
         (45, 84)
         """
-        print("batch:"+str(i))
+        #print("batch:"+str(i))
         yield [train_set_x,train_set_m],train_set_y
 
