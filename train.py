@@ -61,7 +61,7 @@ def init(attr=2,train_size=0.9,batch_size=25,trainable_embed=False):
         pool_sizes.append((_S*(_W-filter_h+1),1))
     model=BigFiveCnnModel(W,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size,trainable_embed=trainable_embed)
     model.summary()
-    model.compile(loss=nll1,optimizer="adadelta")
+    model.compile(loss=nll2,optimizer="adadelta")
     steps=train_idx.shape[0]//batch_size
     v_steps=test_idx.shape[0]//batch_size
     return model,train_generator,test_generator,steps,v_steps
