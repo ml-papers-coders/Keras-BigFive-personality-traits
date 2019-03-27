@@ -21,10 +21,10 @@ def SentenceLevel(embedding_matrix,filter_shapes,pool_sizes,reshape,filter_hs=[1
         filter_shape = filter_shapes[i] # ({1,2,3},300) (h,w)
         pool_size = pool_sizes[i] # S*(img_h-filter_h+1),img_w-filter_w+1
         layer=Conv2D(filters=feature_maps,kernel_size=filter_shape,activation=conv_non_linear)(reshape_layer)
-        print("Conv:LAYER "+str(i)+': input='+str(layer.shape)+' // output= '+str(layer.shape))
+        #print("Conv:LAYER "+str(i)+': input='+str(layer.shape)+' // output= '+str(layer.shape))
         layer=MaxPooling2D(pool_size=pool_size)(layer)
         layers.append(layer)
-        print("MAXPOOL:LAYER "+str(i)+': input='+str(layer.shape)+' // output= '+str(layer.shape))
+        #print("MAXPOOL:LAYER "+str(i)+': input='+str(layer.shape)+' // output= '+str(layer.shape))
     """
     for i in range(len(filter_hs)):
         print(Model(inputs=model_input_layer,outputs=layers[i]).summary())
