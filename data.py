@@ -142,4 +142,4 @@ def tfgenerator(datasets):
         train_set_x=datasets[0][i]
         train_set_y=datasets[1][i].reshape((1,))
         train_set_m=datasets[2][i].reshape((84,))
-        yield train_set_x,train_set_m,train_set_y
+        yield (train_set_x,train_set_m,train_set_y)
