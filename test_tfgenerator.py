@@ -6,7 +6,7 @@ import tensorflow as tf
 def test(attr):
     revs, W, W2, word_idx_map, vocab, mairesse ,charged_words=load_data(attr)
     datasets = w2idx(revs, word_idx_map, mairesse, charged_words, attr, max_l=149, max_s=312, filter_h=3)
-    dataset=tf.data.Dataset.from_generator(generator=tfgenerator,output_types=([tf.int32,tf.float32],tf.int32))
+    dataset=tf.data.Dataset.from_generator(generator=tfgenerator,output_types=(list,tf.int32))
     iterator = dataset.make_one_shot_iterator()
     next_element = iterator.get_next()
     with tf.Session() as sess:
@@ -15,7 +15,7 @@ def test(attr):
         try: 
             # Keep running next_batch till the Dataset is exhausted
             while True:
-                print(sess.run(next_batch))
+                print(sess.run(next_element))
                 
         except tf.errors.OutOfRangeError:
             pass
