@@ -86,7 +86,7 @@ def train(batch_size,attr=2,trainable_embed=False):
         print('=================== Training ===================')
         # checkpoint
         filepath="weights.best.hdf5"
-        checkpoint = ModelCheckpoint(filepath, monitor='accuracy', verbose=1, save_best_only=True, mode='max')
+        checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='max')
         callbacks_list = [checkpoint]
 
         model.fit_generator(
