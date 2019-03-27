@@ -29,7 +29,7 @@ def nll2(y_true, y_pred):
 
     return - K.sum(likelihood.log_prob(y_true), axis=-1)
 
-def init(attr=2,train_size=0.8,test_size=0.1,batch_size=25,trainable_embed=False):
+def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False):
     #data generator
     #load first mini-batch
     """
@@ -80,7 +80,7 @@ def train(batch_size,attr=2,trainable_embed=False):
 
     with tf.device('/cpu:0'):
         model,train_generator,val_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=trainable_embed)
-        #take a pic of the model
+        #take a pic of the modelval_generator
         #plot_model(model, to_file='selfie.png')
     with tf.device('/gpu:0'):
         print('=================== Training ===================')
