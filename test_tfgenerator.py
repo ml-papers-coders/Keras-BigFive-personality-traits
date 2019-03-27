@@ -10,15 +10,15 @@ def test(attr):
     iterator = dataset.make_one_shot_iterator()
     next_element = iterator.get_next()
     with tf.Session() as sess:
-    sess.run(tf.global_variables_initializer())
+        sess.run(tf.global_variables_initializer())
 
-    try: 
-        # Keep running next_batch till the Dataset is exhausted
-        while True:
-            print(sess.run(next_batch))
-            
-    except tf.errors.OutOfRangeError:
-        pass
+        try: 
+            # Keep running next_batch till the Dataset is exhausted
+            while True:
+                print(sess.run(next_batch))
+                
+        except tf.errors.OutOfRangeError:
+            pass
 
 
 
