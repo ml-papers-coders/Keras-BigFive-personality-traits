@@ -93,8 +93,8 @@ def train(batch_size,attr=2,trainable_embed=False):
         generator=train_generator,
         epochs=10,
         validation_data=val_generator,
-        steps_per_epoch=steps//15
-        ,validation_steps=vsteps//15
+        steps_per_epoch=steps//2
+        ,validation_steps=vsteps//2
         ,callbacks=callbacks_list
         #,callbacks=[TensorBoard(
         #    log_dir=LOG_DIR, histogram_freq=0
