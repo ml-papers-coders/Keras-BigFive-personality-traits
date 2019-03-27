@@ -12,7 +12,7 @@ def test(attr):
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
-        try:  ((4,2),(4,1))
+        try:  #((4,2),(4,1))
             # Keep running next_batch till the Dataset is exhausted
             while True:
                 print(sess.run(next_element))
