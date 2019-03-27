@@ -137,3 +137,9 @@ def data_gen(attr,data_idx,datasets,W,batch_size,seed=0):
         #print("batch:"+str(i))
         yield [train_set_x,train_set_m],train_set_y
 
+def tfgenerator(datasets):
+    for i in len(datasets[0]):
+        train_set_x=datasets[0][i]
+        train_set_y=datasets[1][i].reshape((1,))
+        train_set_m=datasets[2][i].reshape((84,))
+        yield [train_set_x,train_set_m],train_set_y

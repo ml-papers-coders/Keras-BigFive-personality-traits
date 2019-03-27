@@ -1,5 +1,5 @@
 from tensorflow.keras.models import Sequential,Model
-from tensorflow.keras.layers import Dense, Activation ,Conv2D,MaxPooling2D , Input,Concatenate, Reshape,Flatten,Dense,Embedding
+from tensorflow.keras.layers import Dense, Activation ,Conv2D,MaxPooling2D , Input,Concatenate, Reshape,Flatten,Dense,Embedding,Dropout
 
 
 def SentenceLevel(embedding_matrix,filter_shapes,pool_sizes,reshape,filter_hs=[1,2,3],hidden_units=200,trainable_embed=False,conv_non_linear='relu'):
@@ -41,7 +41,9 @@ def DocumentLevel(sentlevel,hidden_units,docs_size=312):
     # list of 84 M features per doc
     m_features=Input(shape=(84,))
     output=Concatenate()([output,m_features])
+    output=Dropout(0.5)(output)
     output=Dense(hidden_units[0],activation='sigmoid')(output)
+    output=Dropout(0.5)(output)
     output=Dense(hidden_units[1],activation="softmax")(output)
     return Model(inputs=[sentlevel.input,m_features],outputs=output)
 
