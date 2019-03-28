@@ -79,7 +79,7 @@ def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False
 # getting the number of GPUs 
 def get_available_gpus():
    local_device_protos = device_lib.list_local_devices()
-   return [x.name for x in local_device_protos if x.device_type    == ‘GPU’]
+   return [x.name for x in local_device_protos if x.device_type == "GPU"]
     
 def train(batch_size,attr=2,trainable_embed=False):
     def start(model):
