@@ -72,7 +72,7 @@ def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False
     model=BigFiveCnnModel(W,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size,trainable_embed=trainable_embed)
     #model.summary()
     opt=Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
-    model.compile(loss=nll2,optimizer=opt,metrics = ['accuracy'])
+    model.compile(loss="binary_crossentropy",optimizer=opt,metrics = ['accuracy'])
     steps=int(train_idx.shape[0]//batch_size)
     v_steps=int(val_idx.shape[0]//batch_size)
     return model,train_generator,val_generator,test_generator,steps,v_steps
@@ -136,5 +136,5 @@ def train(batch_size,attr=2,trainable_embed=False):
     
         
     
-train(batch_size=25,trainable_embed=False)
+train(batch_size=25,trainable_embed=True)
 
