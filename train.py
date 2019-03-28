@@ -3,10 +3,12 @@ from tensorflow.keras import backend as K
 import tensorflow as tf
 from data import data_idx,load_data,w2idx,data_gen
 import numpy as np
-from tensorflow.keras.utils import plot_model
+from tensorflow.keras.utils import plot_model,multi_gpu_model
 from tensorflow.keras.callbacks import TensorBoard,ModelCheckpoint
 from tensorflow.keras.optimizers import Adadelta
 import os
+from tensorflow.python.client import device_lib
+
 
 """LOG_DIR = './log'
 tb_cmd='tensorboard --logdir {} --host 0.0.0.0 --port 6006 &'.format(LOG_DIR)
@@ -78,8 +80,8 @@ def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False
 
 # getting the number of GPUs 
 def get_available_gpus():
-   local_device_protos = device_lib.list_local_devices()
-   return [x.name for x in local_device_protos if x.device_type == "GPU"]
+  local_device_protos = device_lib.list_local_devices()
+  return [x.name for x in local_device_protos if x.device_type == "GPU"]
     
 def train(batch_size,attr=2,trainable_embed=False):
     def start(model):
@@ -113,17 +115,17 @@ def train(batch_size,attr=2,trainable_embed=False):
     # exit the program and must use the even number of gpu instance or go to the condition of one gpu.
     if (num_gpu >= 2) and (num_gpu % 2 != 0):
         print("Please use an even number of gpu for training!")
-        sys.exit()
+        exit()
     # an even number of gpu, then run model with multi-gpu.
-    else if (num_gpu >= 2) and (num_gpu % 2 == 0):
+    elif (num_gpu >= 2) and (num_gpu % 2 == 0):
             #using the cpu to build the model
             with tf.device('/cpu'):
                 #compile the model with gpu
                 multi_model = multi_gpu_model(model, gpus=num_gpu)
                 start(multi_model)
     # one gpu, then run as normal model
-    elif not (even_num_gpu or odd_num_gpu):
-            start(model)
+    else:
+        start(model)
 
 
     #with tf.device('/gpu:0'):
