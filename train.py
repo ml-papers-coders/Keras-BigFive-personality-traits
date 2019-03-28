@@ -75,14 +75,14 @@ def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False
     v_steps=int(val_idx.shape[0]//batch_size)
     return model,train_generator,val_generator,test_generator,steps,v_steps
 
+
+# getting the number of GPUs 
+def get_available_gpus():
+   local_device_protos = device_lib.list_local_devices()
+   return [x.name for x in local_device_protos if x.device_type    == ‘GPU’]
     
 def train(batch_size,attr=2,trainable_embed=False):
-
-    with tf.device('/cpu:0'):
-        model,train_generator,val_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=trainable_embed)
-        #take a pic of the modelval_generator
-        #plot_model(model, to_file='selfie.png')
-    with tf.device('/gpu:0'):
+    def start(model):
         print('=================== Training ===================')
         # checkpoint
         filepath="weights.best.hdf5"
@@ -102,6 +102,32 @@ def train(batch_size,attr=2,trainable_embed=False):
         #    , write_images=True)]
         )
         model.save("model.h5")
+
+    with tf.device('/cpu'):
+        model,train_generator,val_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=trainable_embed)
+        #take a pic of the modelval_generator
+        #plot_model(model, to_file='selfie.png')
+    num_gpu = len(get_available_gpus())
+
+    # check to see if we are compiling using an odd number of gpu
+    # exit the program and must use the even number of gpu instance or go to the condition of one gpu.
+    if (num_gpu >= 2) and (num_gpu % 2 != 0):
+        print("Please use an even number of gpu for training!")
+        sys.exit()
+    # an even number of gpu, then run model with multi-gpu.
+    else if (num_gpu >= 2) and (num_gpu % 2 == 0):
+            #using the cpu to build the model
+            with tf.device('/cpu'):
+                #compile the model with gpu
+                multi_model = multi_gpu_model(model, gpus=num_gpu)
+                start(multi_model)
+    # one gpu, then run as normal model
+    elif not (even_num_gpu or odd_num_gpu):
+            start(model)
+
+
+    #with tf.device('/gpu:0'):
+
 
 
 
