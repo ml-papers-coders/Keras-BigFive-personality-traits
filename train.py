@@ -9,7 +9,6 @@ from tensorflow.keras.optimizers import Adadelta
 import os
 from tensorflow.python.client import device_lib
 from tensorflow.keras.models import load_model
-from tensorflow.keras import losses
 
 
 """LOG_DIR = './log'
@@ -33,7 +32,6 @@ def nll2(y_true, y_pred):
     likelihood = tf.distributions.Bernoulli(probs=y_pred)
 
     return - K.sum(likelihood.log_prob(y_true), axis=-1)
-losses.nll1 = nll1
 
 
 def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False,filename=None):
@@ -80,7 +78,7 @@ def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False
         opt=Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
         model.compile(loss=nll1,optimizer=opt,metrics = ['accuracy'])
     else:
-        model=load_model(filename)
+        model=load_model(filename, custom_objects={'nll1': nll1})
     steps=int(train_idx.shape[0]//batch_size)
     v_steps=int(val_idx.shape[0]//batch_size)
     return model,train_generator,val_generator,test_generator,steps,v_steps
