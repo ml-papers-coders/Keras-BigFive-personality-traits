@@ -9,6 +9,7 @@ from tensorflow.keras.optimizers import Adadelta
 import os
 from tensorflow.python.client import device_lib
 from tensorflow.keras.models import load_model
+import tensorflow.keras.losses
 
 
 """LOG_DIR = './log'
@@ -25,12 +26,15 @@ def nll1(y_true, y_pred):
     # over the last axis. we require the sum
     return K.sum(K.binary_crossentropy(y_true, y_pred), axis=-1)
 
+
 def nll2(y_true, y_pred):
     """ Negative log likelihood. """
 
     likelihood = tf.distributions.Bernoulli(probs=y_pred)
 
     return - K.sum(likelihood.log_prob(y_true), axis=-1)
+losses.nll1 = nll1
+
 
 def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False,filename=None):
     #data generator
