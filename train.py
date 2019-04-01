@@ -8,6 +8,7 @@ from tensorflow.keras.callbacks import TensorBoard,ModelCheckpoint
 from tensorflow.keras.optimizers import Adadelta
 import os
 from tensorflow.python.client import device_lib
+from tensorflow.keras.models import load_model
 
 
 """LOG_DIR = './log'
@@ -31,7 +32,7 @@ def nll2(y_true, y_pred):
 
     return - K.sum(likelihood.log_prob(y_true), axis=-1)
 
-def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False):
+def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False,filename=None):
     #data generator
     #load first mini-batch
     """
@@ -69,10 +70,13 @@ def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False
     for filter_h in filter_hs:
         filter_shapes.append((filter_h, _E))
         pool_sizes.append((_S*(_W-filter_h+1),1))
-    model=BigFiveCnnModel(W,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size,trainable_embed=trainable_embed)
-    #model.summary()
-    opt=Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
-    model.compile(loss=nll1,optimizer=opt,metrics = ['accuracy'])
+    if filename==None:
+        model=BigFiveCnnModel(W,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size,trainable_embed=trainable_embed)
+        #model.summary()
+        opt=Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
+        model.compile(loss=nll1,optimizer=opt,metrics = ['accuracy'])
+    else:
+        model=load_model(filename)
     steps=int(train_idx.shape[0]//batch_size)
     v_steps=int(val_idx.shape[0]//batch_size)
     return model,train_generator,val_generator,test_generator,steps,v_steps
@@ -83,11 +87,11 @@ def get_available_gpus():
   local_device_protos = device_lib.list_local_devices()
   return [x.name for x in local_device_protos if x.device_type == "GPU"]
     
-def train(batch_size,attr=2,trainable_embed=False):
+def train(batch_size,attr=2,trainable_embed=False,filename=None):
     def start(model):
         print('=================== Training ===================')
         # checkpoint
-        filepath="weights.best.hdf5"
+        filepath="model.h5"
         checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True,save_weights_only=False, mode='auto')
         callbacks_list = [checkpoint]
 
@@ -106,7 +110,7 @@ def train(batch_size,attr=2,trainable_embed=False):
         model.save("model.h5")
 
     with tf.device('/cpu'):
-        model,train_generator,val_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=trainable_embed)
+        model,train_generator,val_generator,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=trainable_embed,filename=filename)
         #take a pic of the modelval_generator
         #plot_model(model, to_file='selfie.png')
     num_gpu = len(get_available_gpus())
