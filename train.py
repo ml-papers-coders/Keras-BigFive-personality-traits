@@ -140,5 +140,5 @@ def train(batch_size,attr=2,trainable_embed=False,filename=None):
     
         
     
-train(batch_size=25,attr=1,trainable_embed=False)
+train(batch_size=25,attr=1,trainable_embed=False,filename='model.h5')
 
