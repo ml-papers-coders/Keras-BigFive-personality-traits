@@ -9,7 +9,7 @@ from tensorflow.keras.optimizers import Adadelta
 import os
 from tensorflow.python.client import device_lib
 from tensorflow.keras.models import load_model
-import tensorflow.keras.losses
+from tensorflow.keras import losses
 
 
 """LOG_DIR = './log'
