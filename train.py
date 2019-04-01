@@ -22,14 +22,14 @@ def nll1(y_true, y_pred):
 
     # keras.losses.binary_crossentropy give the mean
     # over the last axis. we require the sum
-    return K.sum(K.binary_crossentropy(y_true, y_pred), axis=-1)
+    return K.mean(K.binary_crossentropy(y_true, y_pred), axis=-1)
 
 def nll2(y_true, y_pred):
     """ Negative log likelihood. """
 
     likelihood = tf.distributions.Bernoulli(probs=y_pred)
 
-    return - K.sum(likelihood.log_prob(y_true), axis=-1)
+    return - K.mean(likelihood.log_prob(y_true), axis=-1)
 
 def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False):
     #data generator
@@ -72,7 +72,7 @@ def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False
     model=BigFiveCnnModel(W,filter_shapes,pool_sizes,reshape,filter_hs=filter_hs,hidden_units=hidden_units,docs_size=docs_size,trainable_embed=trainable_embed)
     #model.summary()
     opt=Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
-    model.compile(loss="binary_crossentropy",optimizer=opt,metrics = ['accuracy'])
+    model.compile(loss=nll2,optimizer=opt,metrics = ['accuracy'])
     steps=int(train_idx.shape[0]//batch_size)
     v_steps=int(val_idx.shape[0]//batch_size)
     return model,train_generator,val_generator,test_generator,steps,v_steps
@@ -88,15 +88,15 @@ def train(batch_size,attr=2,trainable_embed=False):
         print('=================== Training ===================')
         # checkpoint
         filepath="weights.best.hdf5"
-        checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='max')
+        checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True,save_weights_only=False, mode='auto')
         callbacks_list = [checkpoint]
 
         model.fit_generator(
         generator=train_generator,
         epochs=10,
         validation_data=val_generator,
-        steps_per_epoch=steps
-        ,validation_steps=vsteps
+        steps_per_epoch=steps//10
+        ,validation_steps=vsteps//10
         ,callbacks=callbacks_list
         #,callbacks=[TensorBoard(
         #    log_dir=LOG_DIR, histogram_freq=0
