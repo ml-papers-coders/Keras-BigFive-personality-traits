@@ -22,14 +22,14 @@ def nll1(y_true, y_pred):
 
     # keras.losses.binary_crossentropy give the mean
     # over the last axis. we require the sum
-    return K.mean(K.binary_crossentropy(y_true, y_pred), axis=-1)
+    return K.sum(K.binary_crossentropy(y_true, y_pred), axis=-1)
 
 def nll2(y_true, y_pred):
     """ Negative log likelihood. """
 
     likelihood = tf.distributions.Bernoulli(probs=y_pred)
 
-    return - K.mean(likelihood.log_prob(y_true), axis=-1)
+    return - K.sum(likelihood.log_prob(y_true), axis=-1)
 
 def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False):
     #data generator
@@ -136,5 +136,5 @@ def train(batch_size,attr=2,trainable_embed=False):
     
         
     
-train(batch_size=25,attr=1,trainable_embed=True)
+train(batch_size=25,attr=1,trainable_embed=False)
 
