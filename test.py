@@ -9,6 +9,7 @@ from tensorflow.keras.optimizers import Adadelta
 import os
 from tensorflow.python.client import device_lib
 from tensorflow.keras.models import load_model
+from sklearn.metrics import accuracy_score
 
 
 """LOG_DIR = './log'
@@ -82,8 +83,8 @@ def test(batch_size,attr=2,trainable_embed=False,filename=None):
     for batch in test_generator:
         x,y_true=batch
         prediction=model.predict(x)
-        print(prediction.shape)
-        print(y_true)
+        prediction=np.argmax([prediction,axis=1)
+        print(accuracy_score(y,prediction,normalize=False))
 
     #with tf.device('/gpu:0'):
 
