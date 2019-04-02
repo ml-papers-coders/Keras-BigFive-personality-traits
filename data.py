@@ -72,16 +72,18 @@ def load_data(attr,data_aug=False):
     revs, W, W2, word_idx_map, vocab, mairesse = x[0], x[1], x[2], x[3], x[4], x[5]
     
     def augment(element_rev):
+
+        if type(element_rev["text"]) != list:
+            return element_rev
         nb=random.randint(0,int(len(element_rev["text"])//2))
         for _ in range(nb):
-            if type(element_rev["text"]) != list:
-                continue
             element_rev["text"].pop(random.randrange(len(element_rev["text"])))
-            return element_rev
+        return element_rev
 
     if data_aug==True:
         revs2=list(map(augment,revs))
         revs=revs+revs2
+        print(revs2)
         print(type(revs))
         print('Data Augmentation...')
     print ("data loaded!")
