@@ -119,11 +119,11 @@ def data_gen(attr,data_idx,datasets,W,batch_size,seed=0,test=False):
         train_set_x=datasets[0][batch_idx]
         #list of 84 feature per doc
         train_set_m=datasets[2][batch_idx].reshape((-1,84))
-        if test==False:
-            train_set_y=datasets[1][batch_idx].reshape((-1,1)) # -1 W,E,1
-            yield [train_set_x,train_set_m],train_set_y
-        else :
-            yield [train_set_x,train_set_m]
+        #if test==False:
+        train_set_y=datasets[1][batch_idx].reshape((-1,1)) # -1 W,E,1
+        yield [train_set_x,train_set_m],train_set_y
+        #else :
+        #    yield [train_set_x,train_set_m]
 
 def tfgenerator(datasets):
     for i in len(datasets[0]):
