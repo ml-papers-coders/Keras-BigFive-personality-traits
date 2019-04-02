@@ -41,7 +41,7 @@ def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False
     train_set_x (45, 312, 153, 300)
     """
     
-    revs, W, W2, word_idx_map, vocab, mairesse ,charged_words=load_data(attr)
+    revs, W, W2, word_idx_map, vocab, mairesse ,charged_words=load_data(attr,data_aug=True)
     datasets = w2idx(revs, word_idx_map, mairesse, charged_words, attr, max_l=149, max_s=312, filter_h=3)
     _D=len(datasets[0])
     _S=len(datasets[0][0])

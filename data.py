@@ -1,7 +1,10 @@
 import numpy as np 
 import csv
 import pickle
+import random
 
+seed=7
+np.random.seed(seed)
 
 def get_idx_from_sent(status, word_idx_map, charged_words, max_l=51, max_s=200, filter_h=5):
     """
@@ -62,12 +65,22 @@ def w2idx(revs, word_idx_map, mairesse, charged_words, per_attr=0, max_l=51, max
 
 
 
-def load_data(attr):
+def load_data(attr,data_aug=False):
     print ("loading data...")
     with open("processed.pkl","rb") as f:
         x = pickle.load(f)
     revs, W, W2, word_idx_map, vocab, mairesse = x[0], x[1], x[2], x[3], x[4], x[5]
+    
+    def augment(element_rev):
+        nb=random.randint(0,int(len(element_rev["text"])//2))
+        for i in range(nb):
+            element_rev["text"]=element_rev["text"].pop(random.randrange(len(element_rev["text"])))
 
+    if data_aug==True:
+        revs2=list(map(augment,revs))
+        revs=revs+revs2
+        mairesse=mairesse+mairesse
+        print('Data Augmentation...')
     print ("data loaded!")
     charged_words=[]
     emof=open("Emotion_Lexicon.csv","r")
@@ -92,8 +105,8 @@ def data_idx2vec(data,W):
     return np.asarray(W[np.array(data.flatten(),dtype="int32")]).reshape((data.shape[0],data.shape[1],data.shape[2],W.shape[1]))
 
 
-def data_idx(data_size,batch_size,seed=0):
-    np.random.seed(seed)
+def data_idx(data_size,batch_size):
+    
     if data_size % batch_size > 0 :
         extra_data_num = batch_size - data_size % batch_size
         
@@ -106,7 +119,7 @@ def data_idx(data_size,batch_size,seed=0):
         new_data=np.random.permutation(range(data_size))
     return new_data    
 
-def data_gen(attr,data_idx,datasets,W,batch_size,seed=0,test=False):
+def data_gen(attr,data_idx,datasets,W,batch_size,test=False):
     #n_batches = int(data_idx.shape[0]//batch_size)
     #_S,_W=reshape
     while True:
