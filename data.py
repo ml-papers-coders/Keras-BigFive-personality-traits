@@ -83,8 +83,6 @@ def load_data(attr,data_aug=False):
     if data_aug==True:
         revs2=list(map(augment,revs))
         revs=revs+revs2
-        print(revs2)
-        print(type(revs))
         print('Data Augmentation...')
     print ("data loaded!")
     charged_words=[]
