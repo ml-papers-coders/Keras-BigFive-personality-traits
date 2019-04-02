@@ -84,7 +84,7 @@ def test(batch_size,attr=2,trainable_embed=False,filename=None):
         x,y_true=batch
         prediction=model.predict(x)
         prediction=np.argmax(prediction,axis=1)
-        print(accuracy_score(y,prediction,normalize=False))
+        print(accuracy_score(y_true,prediction,normalize=False))
 
     #with tf.device('/gpu:0'):
 
