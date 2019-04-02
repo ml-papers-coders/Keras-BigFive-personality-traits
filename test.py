@@ -88,26 +88,10 @@ def get_available_gpus():
     
 def test(batch_size,attr=2,trainable_embed=False,filename=None):
 
-    with tf.device('/cpu'):
-        model,_,_,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=trainable_embed,filename=filename)
-        #take a pic of the modelval_generator
-        #plot_model(model, to_file='selfie.png')
-    num_gpu = len(get_available_gpus())
+    model,_,_,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=trainable_embed,filename=filename)
+    #take a pic of the modelval_generator
+    #plot_model(model, to_file='selfie.png')
 
-    # check to see if we are compiling using an odd number of gpu
-    # exit the program and must use the even number of gpu instance or go to the condition of one gpu.
-    if (num_gpu >= 2) and (num_gpu % 2 != 0):
-        print("Please use an even number of gpu for training!")
-        exit()
-    # an even number of gpu, then run model with multi-gpu.
-    elif (num_gpu >= 2) and (num_gpu % 2 == 0):
-            #using the cpu to build the model
-            with tf.device('/cpu'):
-                #compile the model with gpu
-                multi_model = multi_gpu_model(model, gpus=num_gpu)
-    # one gpu, then run as normal model
-    else:
-        start(model)
 
     for batch in test_generator:
         print(model.predict(batch))
