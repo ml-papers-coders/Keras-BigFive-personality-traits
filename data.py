@@ -76,9 +76,9 @@ def load_data(attr,data_aug=False):
         for _ in range(nb):
             if type(element_rev["text"]) != list:
                 continue
-            #element_rev["text"].pop(random.randrange(len(element_rev["text"])))            
+            element_rev["text"].pop(random.randrange(len(element_rev["text"])))            
 
-    if data_aug==True:
+    if data_aug==False:
         revs2=list(map(augment,revs))
         revs=revs+revs2
         print('Data Augmentation...')
