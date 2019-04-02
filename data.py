@@ -73,9 +73,9 @@ def load_data(attr,data_aug=False):
     
     def augment(element_rev):
         nb=random.randint(0,int(len(element_rev["text"])//2))
-        for i in range(nb):
-            print(element_rev["text"])
-            print(type(element_rev["text"]))
+        for _ in range(nb):
+            if type(element_rev["text"]) != list:
+                continue
             element_rev["text"]=element_rev["text"].pop(random.randrange(len(element_rev["text"])))
 
     if data_aug==True:
