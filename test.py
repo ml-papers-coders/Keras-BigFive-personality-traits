@@ -53,25 +53,9 @@ def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False
     #exit()
 
     #split train val
-    n_train_items=int(np.round(train_size*_D))
-    train_idx=dataset_idx[:n_train_items]
     n_test_items=int(test_size*_D)
     test_idx=dataset_idx[n_train_items:n_train_items+n_test_items]
-    val_idx=dataset_idx[n_train_items+n_test_items:]
-    train_generator=data_gen(attr,train_idx,datasets,W,batch_size=25)
-    val_generator=data_gen(attr,val_idx,datasets,W,batch_size=25)
     test_generator=data_gen(attr,test_idx,datasets,W,batch_size=25)
-    
-    input_shape=(_S*_W,_E,1)
-    docs_size=_S
-    hidden_units=[200,200,2]
-    filter_hs=[1,2,3]
-    filter_shapes = []
-    pool_sizes = []
-    reshape=(_S,_W)
-    for filter_h in filter_hs:
-        filter_shapes.append((filter_h, _E))
-        pool_sizes.append((_S*(_W-filter_h+1),1))
     if filename==None:
         exit()
     else:
