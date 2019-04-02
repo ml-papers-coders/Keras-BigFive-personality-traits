@@ -75,6 +75,7 @@ def load_data(attr,data_aug=False):
         nb=random.randint(0,int(len(element_rev["text"])//2))
         for i in range(nb):
             print(element_rev["text"])
+            print(type(element_rev["text"]))
             element_rev["text"]=element_rev["text"].pop(random.randrange(len(element_rev["text"])))
 
     if data_aug==True:
