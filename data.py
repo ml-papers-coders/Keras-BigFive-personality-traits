@@ -79,7 +79,7 @@ def load_data(attr,data_aug=False):
             element_rev["text"].pop(random.randrange(len(element_rev["text"])))            
 
     if data_aug==True:
-        revs2=list(map(augment,revs))
+        revs2=map(augment,revs)
         print(type(revs))
         print(type(revs2))
         print(revs[0])
