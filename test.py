@@ -80,7 +80,8 @@ def test(batch_size,attr=2,trainable_embed=False,filename=None):
 
 
     for batch in test_generator:
-        print(model.predict(batch))
+        prediction=model.predict(batch)
+        print(prediction.shape)
 
     #with tf.device('/gpu:0'):
 
