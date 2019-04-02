@@ -106,7 +106,7 @@ def data_idx(data_size,batch_size,seed=0):
         new_data=np.random.permutation(range(data_size))
     return new_data    
 
-def data_gen(attr,data_idx,datasets,W,batch_size,seed=0):
+def data_gen(attr,data_idx,datasets,W,batch_size,seed=0,test=False):
     #n_batches = int(data_idx.shape[0]//batch_size)
     #_S,_W=reshape
     while True:
@@ -115,27 +115,15 @@ def data_gen(attr,data_idx,datasets,W,batch_size,seed=0):
         data_idx=data_idx[rand_perm]
         batch_idx=data_idx[:batch_size]
         
+
         train_set_x=datasets[0][batch_idx]
-        train_set_y=datasets[1][batch_idx].reshape((-1,1)) # -1 W,E,1
         #list of 84 feature per doc
         train_set_m=datasets[2][batch_idx].reshape((-1,84))
-        #print('Mini-batch load : before transform idx to embed')
-        #print(train_set_x.shape)
-        #print(train_set_x.dtype) int64
-        #train_set_x=data_idx2vec(train_set_x,W)
-        #_E=W.shape[1]
-        #train_set_x=train_set_x.reshape((-1,_S,_W))
-        #print(train_set_x.shape)
-        #print(train_set_y.shape)
-    
-        """
-        print(train_set_x.shape)
-        print(train_set_m.shape)
-        (45, 312, 153, 300)
-        (45, 84)
-        """
-        #print("batch:"+str(i))
-        yield [train_set_x,train_set_m],train_set_y
+        if test==False:
+            train_set_y=datasets[1][batch_idx].reshape((-1,1)) # -1 W,E,1
+            yield [train_set_x,train_set_m],train_set_y
+        else :
+            yield [train_set_x,train_set_m]
 
 def tfgenerator(datasets):
     for i in len(datasets[0]):

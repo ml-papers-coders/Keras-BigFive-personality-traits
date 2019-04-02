@@ -57,7 +57,7 @@ def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False
     n_test_items=int(test_size*_D)
     test_idx=dataset_idx[n_train_items:n_train_items+n_test_items]
     val_idx=dataset_idx[n_train_items+n_test_items:]
-    test_generator=data_gen(attr,test_idx,datasets,W,batch_size=25)
+    test_generator=data_gen(attr,test_idx,datasets,W,batch_size=25,test=True)
 
     if filename==None:
         exit()
