@@ -53,16 +53,18 @@ def init(attr=2,train_size=0.7,test_size=0.1,batch_size=25,trainable_embed=False
     #exit()
 
     #split train val
+    n_train_items=int(np.round(train_size*_D))
     n_test_items=int(test_size*_D)
     test_idx=dataset_idx[n_train_items:n_train_items+n_test_items]
+    val_idx=dataset_idx[n_train_items+n_test_items:]
     test_generator=data_gen(attr,test_idx,datasets,W,batch_size=25)
+
     if filename==None:
         exit()
     else:
         model=load_model(filename, custom_objects={'nll1': nll1})
-    steps=int(train_idx.shape[0]//batch_size)
-    v_steps=int(val_idx.shape[0]//batch_size)
-    return model,train_generator,val_generator,test_generator,steps,v_steps
+
+    return model,test_generator
 
 
 # getting the number of GPUs 
@@ -72,7 +74,7 @@ def get_available_gpus():
     
 def test(batch_size,attr=2,trainable_embed=False,filename=None):
 
-    model,_,_,test_generator,steps,vsteps=init(attr,batch_size=batch_size,trainable_embed=trainable_embed,filename=filename)
+    model,test_generator=init(attr,batch_size=batch_size,trainable_embed=trainable_embed,filename=filename)
     #take a pic of the modelval_generator
     #plot_model(model, to_file='selfie.png')
 
