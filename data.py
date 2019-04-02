@@ -77,12 +77,11 @@ def load_data(attr,data_aug=False):
             if type(element_rev["text"]) != list:
                 continue
             element_rev["text"]=element_rev["text"].pop(random.randrange(len(element_rev["text"])))
+            
 
     if data_aug==True:
         revs2=list(map(augment,revs))
         revs=revs+revs2
-        print(mairesse)
-        mairesse=mairesse+mairesse
         print('Data Augmentation...')
     print ("data loaded!")
     charged_words=[]
