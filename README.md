@@ -1,6 +1,6 @@
-# New Keras & Python3 implementation of " Deep Learning-Based Document Modeling for Personality Detection from Text "
-
-
+# New Keras implementation of " Deep Learning-Based Document Modeling for Personality Detection from Text "
+- Python3
+- Keras
 ##### [An old implementation of the paper](https://github.com/SenticNet/personality-detection) was made by the authors with Python 2 and Theono , in this version the model architecture is more understandable from the [code](https://github.com/laifi/BigFive/blob/master/model.py)
 ##### The memory consummation is optimized in this work
 
